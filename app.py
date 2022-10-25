@@ -2,7 +2,7 @@
 import flask
 
 # current directory
-app = flask.Flask(__name__, template_folder='.')
+app = flask.Flask(__name__, template_folder='./templates')
 
 
 @app.route('/', methods=['GET'])
