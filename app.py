@@ -7,11 +7,17 @@ app = flask.Flask(__name__, template_folder='./templates')
 
 @app.route('/', methods=['GET'])
 @app.route('/index', methods=['GET'])
-def index():
-
+def index(): #has upload media function
     html_code = flask.render_template('index.html')
     response = flask.make_response(html_code)
     return response
+
+@app.route('/submit', methods=['GET'])
+def submit_form(): #form to fill out additional info
+    html_code = flask.render_template('submitform.html')
+    response = flask.make_response(html_code)
+    return response
+
 
 
 
