@@ -10,28 +10,43 @@
       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
    </head>
    <body>
+      <hr>
       <h1>Bayard Rustin Archive</h1>
       <hr/>
-      <div class="input-group">
-         <div class="input-group-prepend">
-           <span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
+
+      <div class="container">
+         <div class="input-group">
+            <div class="custom-file">
+               <input type="file" class="custom-file-input" id="customFileInput" aria-describedby="customFileInput">
+               <label class="custom-file-label" for="customFileInput">Select file</label>
+            </div>
+            <div class="input-group-append">
+               <form action="/" method="post">
+                  <button class="btn btn-primary" type="button" id="customFileInput">Upload</button>
+               </form>
+            </div>
          </div>
-         <div class="custom-file">
-           <input type="file" class="custom-file-input" id="inputGroupFile01"
-             aria-describedby="inputGroupFileAddon01">
-           <label class="custom-file-label" for="inputGroupFile01">Choose file</label>
-         </div>
-       </div>
+      </div>
+
+      <script>
+         document.querySelector('.custom-file-input').addEventListener('change', function (e) {
+           var name = document.getElementById("customFileInput").files[0].name;
+           var nextSibling = e.target.nextElementSibling
+           nextSibling.innerText = name
+         })
+       </script>
+
+
       <hr>
       <h2>Bayard Rustin Gallery</h2>
-      <table>
+      <!-- <table>
       <thead><tr><th>Name</th><th>Description</th></tr></thead>
       <tbody>
       <tr><td>Name1</td><td>Description1</td></tr>
       <tr><td>Name2</td><td>Description2</td></tr>
       <tr><td>Name3</td><td>Description3</td></tr>
       </tbody>
-      </table>
+      </table> -->
    
       <!-- Optional JavaScript -->
       <!-- jQuery first, then Popper.js, then Bootstrap JS -->
