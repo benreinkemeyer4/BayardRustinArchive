@@ -23,19 +23,20 @@
       <h1>Bayard Rustin Archive</h1>
       <hr/>
       <h3>Upload your media file</h3>
-      <div class="container">
-         <div class="input-group">
-            <div class="custom-file">
-               <input type="file" class="custom-file-input" id="customFileInput" aria-describedby="customFileInput">
-               <label class="custom-file-label" for="customFileInput">Select file</label>
-            </div>
-            <div class="input-group-append">
-               <form action="/" method="post">
-                  <button class="btn btn-primary" type="button" id="customFileInput">Upload</button>
-               </form>
+      <form action="/" method="post">
+         <div class="container">
+            <div class="input-group">
+               <div class="custom-file">
+                  <input type="file" class="custom-file-input" id="customFileInput" aria-describedby="customFileInput">
+                  <label class="custom-file-label" for="customFileInput">Select file</label>
+               </div>
+               <div class="input-group-append">
+                  <!-- make the type of button I do want -->
+                  <input type="submit" id="customFileInput"></button> 
+               </div>
             </div>
          </div>
-      </div>
+      </form>
 
       <script>
          document.querySelector('.custom-file-input').addEventListener('change', function (e) {
