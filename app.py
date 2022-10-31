@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, make_response, redirect, flas
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
 from database.query_db import query_db
+from database.insert_db import insert_db
 import os
 
 
@@ -72,6 +73,7 @@ def upload_media_details():
             "description": request.form.get('description')
         }
         print(submission)
+        insert_db(submission)
         return redirect('/thank_you')
 
     html_code = render_template('upload_media_details.html')
