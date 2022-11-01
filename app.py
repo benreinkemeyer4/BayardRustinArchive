@@ -107,3 +107,13 @@ def gallery():
         results = results)
     response = make_response(html_code)
     return response
+
+@app.route('/details', methods=['GET'])
+def singleitemview():
+    mediaid = request.args.get('mediaid')
+    print(mediaid)
+    # results = query_db(mediaid)
+    # print(results)
+    # html_code = render_template('singleitemview.html')
+    # response = make_response(html_code)
+    # return response

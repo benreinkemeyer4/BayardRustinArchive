@@ -10,37 +10,17 @@
 
     <title>Bayard Rustin Archive</title>
   </head>
-  <body>
-    <div style="margin-left: 20%;">
+    <body>
 
-    <div action="/gallery" method="get">
-        <table class="table table-striped">
-            <thead>
-              <tr>
-                <th scope="col">Link</th>
-                <th scope="col">Title</th>
-                <th scope="col">Contributor</th>
-                <th scope="col">Media Type</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for result in results: %}
+    <hr>
 
-              <tr>
-                <th scope="row"><a href="/details?mediaid={{result[0]}}">
-                  {{result[0]}}</a></th>
-                <td>{{result[6]}}</td>
-                <td>{{result[1]}}</td>
-                <td>{{result[5]}}</td>
-              </tr>
-            {% endfor %}
+    <h2>{{title}}</h2>
 
-            </tbody>
-          </table>
+    <strong>Date: </strong> {{date}}<br>
+    <strong>Contributor: </strong>{{contributor}}<br>
+    <strong>Description: </strong>{{description}}<br>
 
 
-    </div>
-    </div>
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
