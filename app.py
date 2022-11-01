@@ -5,6 +5,8 @@ from werkzeug.exceptions import RequestEntityTooLarge
 from database.query_db import query_db
 from database.insert_db import insert_db
 import os
+import cloudinary_methods
+import asyncio
 
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'jpg', 'jpeg'}
@@ -27,7 +29,7 @@ def allowed_file(filename):
 
 @app.route('/', methods=['GET','POST'])
 @app.route('/index', methods=['GET', 'POST'])
-def index():
+async def index():
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -44,7 +46,17 @@ def index():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+            file.save(path)
+
+
+            #upload to cloudinary
+            url = cloudinary_methods.upload(path)
+
+            print(url)
+
+
             print('File successfully uploaded')
             flash('File successfully uploaded')
             return redirect('/upload_media_details')
@@ -66,7 +78,7 @@ def upload_media_details():
     if request.method == 'POST':
         submission = {
             "submitter-name": request.form.get('submitter-name'),
-            "date": request.form.get('date'),
+            "date_taken": request.form.get('date'),
             "submitter-email": request.form.get('submitter-email'),
             "tags": request.form.get('tags'),
             "title": request.form.get('title'),

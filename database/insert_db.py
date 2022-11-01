@@ -1,14 +1,17 @@
 import psycopg2
 from psycopg2 import Error
 import urllib.parse as up
+from datetime import date
 
 url = up.urlparse("postgres://oegsfiae:WUg1B4yX8l8PXcVH_E87mjkgD6IfcTOV@peanut.db.elephantsql.com/oegsfiae")
 
 def insert_db(submission):
     sub_name = submission["submitter-name"]
-    date = submission["date"]
+    date_taken = submission["date_taken"]
+    date_uploaded = date.today()
     sub_email = submission["submitter-email"]
     tags = submission["tags"]
+    media_url = ""
     title = submission["title"]
     desc = submission["description"]
 
@@ -26,8 +29,9 @@ def insert_db(submission):
         cursor = connection.cursor()
         # Executing a SQL query
         #cursor.execute('''INSERT INTO submissions (name,date_taken,date_uploaded,email,tags,title,description,media_url) VALUES ('Bob Dylan', '1993-03-15','2022-10-29', 'sw42@princeton.edu', 'document', 'test', 'test', 'test');''')
-        stmt = "INSERT INTO submissions (name,date,email,tags,title,description,media_url) VALUES ("+sub_name+", "+date+", "+sub_email+", "+tags+", "+title+", "+desc+");"
-        cursor.execute(stmt)
+
+        stmt = '''INSERT INTO submissions (name,date_taken,date_uploaded,email,tags,title,description,media_url) VALUES (%s, %s,%s, %s, %s, %s, %s, %s);'''
+        cursor.execute(stmt, (sub_name, date_taken, date_uploaded, sub_email, tags, title, desc, media_url))
         connection.commit()
         print("1 Record inserted successfully")
         # Fetch result

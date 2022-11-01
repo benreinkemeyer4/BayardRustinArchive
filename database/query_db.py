@@ -5,7 +5,7 @@ import urllib.parse as up
 url = up.urlparse("postgres://oegsfiae:WUg1B4yX8l8PXcVH_E87mjkgD6IfcTOV@peanut.db.elephantsql.com/oegsfiae")
 
 
-def query_db(): 
+def query_db():
     try:
         up.uses_netloc.append("postgres")
 
