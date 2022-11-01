@@ -4,6 +4,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
 from database.query_db import query_db
 import os
+#import cloudinary_methods
 
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'jpg', 'jpeg'}
@@ -43,7 +44,13 @@ def index():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(path)
+
+            #upload to cloudinary
+            url = cloudinary_methods.upload(path)
+            # add this url to database (backend job)
+
             print('File successfully uploaded')
             flash('File successfully uploaded')
             return redirect('/upload_media_details')
@@ -93,3 +100,6 @@ def gallery():
         results = results)
     response = make_response(html_code)
     return response
+
+
+
