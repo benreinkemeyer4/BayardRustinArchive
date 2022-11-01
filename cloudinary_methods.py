@@ -8,10 +8,13 @@ cloudinary.config(
   api_key = "747566525248729", 
   api_secret = "ygGyzq2xheDAfEd8v4dqttF4sro" 
 )
-#CLOUDINARY_URL="//" + api_key + ":" + "api_secret" + "@" + cloud_name
 
 def upload(file):
-  cloudinary.uploader.upload(file)
-  return cloudinary.CloudinaryImage(str(file)).build_url()
+  # upload file to cloudinary
+  uploaded_file = cloudinary.uploader.upload(file)
+
+  # delete file from local env
+
+  return uploaded_file['url']
 
 

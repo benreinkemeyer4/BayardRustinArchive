@@ -4,7 +4,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
 from database.query_db import query_db
 import os
-#import cloudinary_methods
+import cloudinary_methods
 
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'jpg', 'jpeg'}
@@ -50,6 +50,7 @@ def index():
             #upload to cloudinary
             url = cloudinary_methods.upload(path)
             # add this url to database (backend job)
+            print(url)
 
             print('File successfully uploaded')
             flash('File successfully uploaded')
