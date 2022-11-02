@@ -1,16 +1,17 @@
 #!/usr/bin/env python
-from flask import Flask, render_template, request, make_response, redirect, flash
+from flask import Flask, render_template, request, make_response, redirect, flash, url_for
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
 from database.query_db import query_db
 from database.insert_db import insert_db
-import os
+from database.query_singleitem_db import query_singleitem_db
 import cloudinary_methods
-import asyncio
 
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'jpg', 'jpeg'}
 UPLOAD_FOLDER = './uploads'
+
+
 
 # current directory
 app = Flask(__name__, template_folder='./pages')
@@ -21,6 +22,8 @@ MAX_MB = 10
 app.config['MAX_CONTENT_LENGTH'] = MAX_MB * 1024 * 1024
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+media_url = ""
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -44,22 +47,20 @@ async def index():
 
             print('No selected file')
             return redirect(request.url)
+
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-
-            file.save(path)
-
-
             #upload to cloudinary
-            url = cloudinary_methods.upload(path)
+            url = cloudinary_methods.upload(file)
 
             print(url)
+
+            global media_url
+            media_url = url
 
 
             print('File successfully uploaded')
             flash('File successfully uploaded')
-            return redirect('/upload_media_details')
+            return redirect(url_for('upload_media_details'))
         else:
             print('Allowed file types are txt, pdf, jpg, jpeg')
             flash('Allowed file types are txt, pdf, jpg, jpeg')
@@ -82,7 +83,8 @@ def upload_media_details():
             "submitter-email": request.form.get('submitter-email'),
             "tags": request.form.get('tags'),
             "title": request.form.get('title'),
-            "description": request.form.get('description')
+            "description": request.form.get('description'),
+            "media_url": media_url
         }
         print(submission)
         insert_db(submission)
@@ -112,8 +114,18 @@ def gallery():
 def singleitemview():
     mediaid = request.args.get('mediaid')
     print(mediaid)
-    # results = query_db(mediaid)
-    # print(results)
-    # html_code = render_template('singleitemview.html')
-    # response = make_response(html_code)
-    # return response
+    results = query_singleitem_db(mediaid)
+
+    result = results[0]
+
+    print(result)
+
+    result_dict = {
+        "title": result[6],
+        "desc": result[7],
+        "submitter-name": result[1],
+        "mediaurl": result[8]
+    }
+    html_code = render_template('singleitemview.html', result=result_dict)
+    response = make_response(html_code)
+    return response

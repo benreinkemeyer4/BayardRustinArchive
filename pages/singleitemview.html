@@ -14,11 +14,15 @@
 
     <hr>
 
-    <h2>{{title}}</h2>
+    <h2>{{result["title"]}}</h2>
 
-    <strong>Date: </strong> {{date}}<br>
-    <strong>Contributor: </strong>{{contributor}}<br>
-    <strong>Description: </strong>{{description}}<br>
+    <strong>Description: </strong>{{result["desc"]}}<br>
+
+    <strong>Contributor Names: </strong>{{result["submitter-name"]}}<br>
+
+    <img src="{{result.mediaurl}}"/>
+
+
 
 
 

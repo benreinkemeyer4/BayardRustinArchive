@@ -11,9 +11,9 @@ def insert_db(submission):
     date_uploaded = date.today()
     sub_email = submission["submitter-email"]
     tags = submission["tags"]
-    media_url = ""
     title = submission["title"]
     desc = submission["description"]
+    media_url = submission["media_url"]
 
     try:
         up.uses_netloc.append("postgres")

@@ -10,5 +10,5 @@ cloudinary.config(
 #CLOUDINARY_URL="//" + api_key + ":" + "api_secret" + "@" + cloud_name
 
 def upload(file):
-  cloudinary.uploader.upload(file)
-  return cloudinary.CloudinaryImage(str(file)).build_url()
+  upload_result = cloudinary.uploader.upload(file)
+  return upload_result["secure_url"]
