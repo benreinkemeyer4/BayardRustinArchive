@@ -59,7 +59,6 @@ async def index():
 
 
             print('File successfully uploaded')
-            flash('File successfully uploaded')
             return redirect(url_for('upload_media_details'))
         else:
             print('Allowed file types are txt, pdf, jpg, jpeg')
@@ -114,7 +113,7 @@ def gallery():
 def singleitemview():
     mediaid = request.args.get('mediaid')
     print(mediaid)
-    results = query_singleitem_db(mediaid)
+    results = query_singleitem_db(str(mediaid))
 
     result = results[0]
 
@@ -124,7 +123,8 @@ def singleitemview():
         "title": result[6],
         "desc": result[7],
         "submitter-name": result[1],
-        "mediaurl": result[8]
+        "mediaurl": result[8],
+        "tag": result[5]
     }
     html_code = render_template('singleitemview.html', result=result_dict)
     response = make_response(html_code)

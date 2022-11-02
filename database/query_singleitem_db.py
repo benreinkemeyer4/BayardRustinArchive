@@ -16,11 +16,13 @@ def query_singleitem_db(media_id):
         host=url.hostname,
         port=url.port)
 
+        print(media_id)
+
         # Create a cursor to perform database operations
         cursor = connection.cursor()
         stmt = "SELECT * FROM public.submissions WHERE submission_id = %s;"
         # Executing a SQL query
-        cursor.execute(stmt, (media_id))
+        cursor.execute(stmt, (media_id,))
         # Fetch result
         record = cursor.fetchall()
         return record

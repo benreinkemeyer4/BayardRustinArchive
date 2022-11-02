@@ -20,7 +20,12 @@
 
     <strong>Contributor Names: </strong>{{result["submitter-name"]}}<br>
 
+
+    {% if result["tag"] == "Image"%}
     <img src="{{result.mediaurl}}"/>
+    {% elif result["tag"] == "Document" %}
+    <embed src="{{result.mediaurl}}" width="800px" height="2100px" />
+    {% endif %}
 
 
 
