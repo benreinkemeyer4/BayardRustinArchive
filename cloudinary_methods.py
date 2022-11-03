@@ -1,6 +1,5 @@
 import cloudinary
 import cloudinary.uploader
-import cloudinary.api
 
 cloudinary.config(
   cloud_name = "ddnep8fs3",
