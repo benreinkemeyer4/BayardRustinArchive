@@ -109,6 +109,16 @@ def gallery():
     response = make_response(html_code)
     return response
 
+@app.route('/admin_gallery', methods=['GET'])
+def admin_gallery():
+    results = query_db()
+    print(results)
+    html_code = render_template('admin_gallery.html', \
+        results = results)
+    response = make_response(html_code)
+    return response
+
+
 @app.route('/details', methods=['GET'])
 def singleitemview():
     mediaid = request.args.get('mediaid')
@@ -127,5 +137,27 @@ def singleitemview():
         "tag": result[5]
     }
     html_code = render_template('singleitemview.html', result=result_dict)
+    response = make_response(html_code)
+    return response
+
+
+@app.route('/admin_details', methods=['GET'])
+def admin_singleitemview():
+    mediaid = request.args.get('mediaid')
+    print(mediaid)
+    results = query_singleitem_db(str(mediaid))
+
+    result = results[0]
+
+    print(result)
+
+    result_dict = {
+        "title": result[6],
+        "desc": result[7],
+        "submitter-name": result[1],
+        "mediaurl": result[8],
+        "tag": result[5]
+    }
+    html_code = render_template('admin_singleitemview.html', result=result_dict)
     response = make_response(html_code)
     return response
