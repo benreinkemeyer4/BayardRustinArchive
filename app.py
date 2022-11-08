@@ -168,3 +168,9 @@ def google_verification():
     html_code = render_template('google877fb3e18a07139a.html')
     response = make_response(html_code)
     return response
+
+@app.route('/header', methods=['GET'])
+def header():
+    html_code = render_template('header.html')
+    response = make_response(html_code)
+    return response
