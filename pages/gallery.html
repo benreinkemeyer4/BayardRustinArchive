@@ -29,7 +29,7 @@
             </thead>
             <tbody>
               {% for result in results: %}
-
+              {% if result[9] == True %}
               <tr>
                 <td><a href="/details?mediaid={{result[0]}}">
                   {% if result[5] == "Image"%}
@@ -42,6 +42,7 @@
                 <td>{{result[3]}}</td>
                 <td>{{result[5]}}</td>
               </tr>
+              {% endif %}
             {% endfor %}
 
             </tbody>

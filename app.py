@@ -5,6 +5,8 @@ from werkzeug.exceptions import RequestEntityTooLarge
 from database.query_db import query_db
 from database.insert_db import insert_db
 from database.query_singleitem_db import query_singleitem_db
+from database.approve_sub import approve_sub
+
 import cloudinary_methods
 
 
@@ -141,26 +143,34 @@ def singleitemview():
     return response
 
 
-@app.route('/admin_details', methods=['GET'])
+@app.route('/admin_details', methods=['GET', 'POST'])
 def admin_singleitemview():
-    mediaid = request.args.get('mediaid')
-    print(mediaid)
-    results = query_singleitem_db(str(mediaid))
 
-    result = results[0]
+    if request.method == 'POST':
+        mediaid = request.form.get('mediaid')
+        approve_sub(str(mediaid))
+        return redirect('/admin_gallery')
 
-    print(result)
+    else:
 
-    result_dict = {
-        "title": result[6],
-        "desc": result[7],
-        "submitter-name": result[1],
-        "mediaurl": result[8],
-        "tag": result[5]
-    }
-    html_code = render_template('admin_singleitemview.html', result=result_dict)
-    response = make_response(html_code)
-    return response
+        mediaid = request.args.get('mediaid')
+        results = query_singleitem_db(str(mediaid))
+
+        result = results[0]
+
+        print(result)
+
+        result_dict = {
+            "title": result[6],
+            "desc": result[7],
+            "submitter-name": result[1],
+            "mediaurl": result[8],
+            "tag": result[5],
+            "mediaid":result[0]
+        }
+        html_code = render_template('admin_singleitemview.html', result=result_dict)
+        response = make_response(html_code)
+        return response
 
 
 @app.route('/google877fb3e18a07139a', methods=['GET'])

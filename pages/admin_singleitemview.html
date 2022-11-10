@@ -14,8 +14,10 @@
 
         <div style="display: flex;">
             <button>Delete</button>
-
-            <button>Approve</button>
+            <form method="post" action="/admin_details">
+                <input name="mediaid" value="{{result.mediaid}}" type="hidden">
+                <input type="submit" name="approve" value="Approve">
+            </form>
         </div>
     <hr>
     <div style="display: flex;

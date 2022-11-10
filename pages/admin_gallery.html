@@ -25,11 +25,11 @@
                 <th>Contributor</th>
                 <th>Upload Date</th>
                 <th>Media Type</th>
+                <th>Approved</th>
               </tr>
             </thead>
             <tbody>
               {% for result in results: %}
-
               <tr>
                 <td><a href="/admin_details?mediaid={{result[0]}}">
                   {% if result[5] == "Image"%}
@@ -41,6 +41,7 @@
                 <td>{{result[1]}}</td>
                 <td>{{result[3]}}</td>
                 <td>{{result[5]}}</td>
+                <td>{{result[9]}}</td>
               </tr>
             {% endfor %}
 
