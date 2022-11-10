@@ -173,8 +173,8 @@ def admin_singleitemview():
         return response
 
 
-@app.route('/google877fb3e18a07139a', methods=['GET'])
-def google_verification():
-    html_code = render_template('google877fb3e18a07139a.html')
-    response = make_response(html_code)
-    return response
+# @app.route('/google877fb3e18a07139a', methods=['GET'])
+# def google_verification():
+#     html_code = render_template('google877fb3e18a07139a.html')
+#     response = make_response(html_code)
+#     return response
