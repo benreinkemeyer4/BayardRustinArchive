@@ -3,3 +3,8 @@ psycopg2==2.9.5
 Werkzeug==2.2.2
 Gunicorn
 cloudinary==1.25.0
+
+requests==2.21.0
+oauthlib==3.0.1
+pyOpenSSL==19.0.0
+Flask-Login==0.4.1

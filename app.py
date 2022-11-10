@@ -6,9 +6,9 @@ from database.query_db import query_db
 from database.insert_db import insert_db
 from database.query_singleitem_db import query_singleitem_db
 from database.approve_sub import approve_sub
+import auth
 
 import cloudinary_methods
-
 
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'jpg', 'jpeg'}
 UPLOAD_FOLDER = './uploads'
@@ -32,6 +32,24 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+# Routes for authentication. -------------------
+@app.route('/login', methods=['GET'])
+def login():
+    return auth.login()
+
+@app.route('/login/callback', methods=['GET'])
+def callback():
+    return auth.callback()
+
+@app.route('/logoutapp', methods=['GET'])
+def logoutapp():
+    return auth.logoutapp()
+
+@app.route('/logoutgoogle', methods=['GET'])
+def logoutgoogle():
+    return auth.logoutgoogle()
+
+# ---------------------------------------------------
 @app.route('/', methods=['GET','POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
@@ -53,8 +71,6 @@ def index():
         if file and allowed_file(file.filename):
             #upload to cloudinary
             url = cloudinary_methods.upload(file)
-
-            print(url)
 
             global media_url
             media_url = url
@@ -113,16 +129,18 @@ def gallery():
 
 @app.route('/admin_gallery', methods=['GET'])
 def admin_gallery():
+    username = auth.authenticate()
     results = query_db()
     print(results)
     html_code = render_template('admin_gallery.html', \
-        results = results)
+        results = results, username = username)
     response = make_response(html_code)
     return response
 
 
 @app.route('/details', methods=['GET'])
 def singleitemview():
+    username = auth.authenticate()
     mediaid = request.args.get('mediaid')
     print(mediaid)
     results = query_singleitem_db(str(mediaid))
@@ -139,7 +157,7 @@ def singleitemview():
         "tag": result[5]
     }
     html_code = render_template('singleitemview.html', result=result_dict)
-    response = make_response(html_code)
+    response = make_response(html_code, username = username)
     return response
 
 
