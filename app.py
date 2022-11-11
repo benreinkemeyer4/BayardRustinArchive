@@ -175,7 +175,6 @@ def admin_singleitemview():
         results = query_singleitem_db(str(mediaid))
 
         result = results[0]
-
         print(result)
 
         result_dict = {
@@ -189,6 +188,18 @@ def admin_singleitemview():
         html_code = render_template('admin_singleitemview.html', result=result_dict)
         response = make_response(html_code)
         return response
+
+@app.route('/google877fb3e18a07139a', methods=['GET'])
+def google_verification():
+    html_code = render_template('google877fb3e18a07139a.html')
+    response = make_response(html_code)
+    return response
+
+@app.route('/header', methods=['GET'])
+def header():
+    html_code = render_template('header.html')
+    response = make_response(html_code)
+    return response
 
 
 # @app.route('/google877fb3e18a07139a', methods=['GET'])
