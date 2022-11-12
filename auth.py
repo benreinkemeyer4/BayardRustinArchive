@@ -121,8 +121,12 @@ def callback():
     #-------------------------------------------------------------------
 
     # Optional: Make sure the user's email address is verified.
-    if not userinfo_response.json().get('email_verified'):
-        message = 'User email not available or not verified by Google.'
+    # if not userinfo_response.json().get('email_verified'):
+    #     message = 'User email not available or not verified by Google.'
+    #     return message, 400
+    validemails = {"kxli@princeton.edu", "johnsonan299@gmail.com", "sw42@princeton.edu", "al52@princeton.edu", "brr2@princeton.edu", "sc73@princeton.edu", "brcsjqueerlib@gmail.com", "rustincenter@gmail.com"}
+    if not userinfo_response.json()['email'] in validemails:
+        message = 'User email not available or not verified by Google.' #CHANGE THIS TO SAY NOT AUTHORIZED AND GO BACK TO HOMEPAGE
         return message, 400
 
     # Save the user profile data in the session.

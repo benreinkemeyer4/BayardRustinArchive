@@ -145,17 +145,19 @@ def singleitemview():
     print(mediaid)
     results = query_singleitem_db(str(mediaid))
 
-    result = results[0]
+    result_dict = {}
+    if results:
+        result = results[0]
 
-    print(result)
+        print(result)
 
-    result_dict = {
-        "title": result[6],
-        "desc": result[7],
-        "submitter-name": result[1],
-        "mediaurl": result[8],
-        "tag": result[5]
-    }
+        result_dict = {
+            "title": result[6],
+            "desc": result[7],
+            "submitter-name": result[1],
+            "mediaurl": result[8],
+            "tag": result[5]
+        }
     html_code = render_template('singleitemview.html', result=result_dict)
     response = make_response(html_code, username = username)
     return response
@@ -163,7 +165,7 @@ def singleitemview():
 
 @app.route('/admin_details', methods=['GET', 'POST'])
 def admin_singleitemview():
-
+    username = auth.authenticate()
     if request.method == 'POST':
         mediaid = request.form.get('mediaid')
         approve_sub(str(mediaid))
@@ -186,14 +188,8 @@ def admin_singleitemview():
             "mediaid":result[0]
         }
         html_code = render_template('admin_singleitemview.html', result=result_dict)
-        response = make_response(html_code)
+        response = make_response(html_code, username = username)
         return response
-
-@app.route('/google877fb3e18a07139a', methods=['GET'])
-def google_verification():
-    html_code = render_template('google877fb3e18a07139a.html')
-    response = make_response(html_code)
-    return response
 
 @app.route('/header', methods=['GET'])
 def header():
@@ -201,9 +197,3 @@ def header():
     response = make_response(html_code)
     return response
 
-
-# @app.route('/google877fb3e18a07139a', methods=['GET'])
-# def google_verification():
-#     html_code = render_template('google877fb3e18a07139a.html')
-#     response = make_response(html_code)
-#     return response
