@@ -6,6 +6,7 @@ from database.query_db import query_db
 from database.insert_db import insert_db
 from database.query_singleitem_db import query_singleitem_db
 from database.approve_sub import approve_sub
+from database.delete_db import delete_db
 import auth
 
 import cloudinary_methods
@@ -112,6 +113,12 @@ def upload_media_details():
     return response
 
 
+@app.route('/unauthorized_page', methods=['GET'])
+def unauthorized_page():
+    html_code = render_template('unauthorized_page.html')
+    response = make_response(html_code)
+    return response
+
 @app.route('/thank_you', methods=['GET'])
 def thank_you():
     html_code = render_template('thank_you.html')
@@ -133,14 +140,13 @@ def admin_gallery():
     results = query_db()
     print(results)
     html_code = render_template('admin_gallery.html', \
-        results = results, username = username)
+        results = results)
     response = make_response(html_code)
     return response
 
 
 @app.route('/details', methods=['GET'])
 def singleitemview():
-    username = auth.authenticate()
     mediaid = request.args.get('mediaid')
     print(mediaid)
     results = query_singleitem_db(str(mediaid))
@@ -159,17 +165,23 @@ def singleitemview():
             "tag": result[5]
         }
     html_code = render_template('singleitemview.html', result=result_dict)
-    response = make_response(html_code, username = username)
+    response = make_response(html_code)
     return response
+
 
 
 @app.route('/admin_details', methods=['GET', 'POST'])
 def admin_singleitemview():
     username = auth.authenticate()
     if request.method == 'POST':
-        mediaid = request.form.get('mediaid')
-        approve_sub(str(mediaid))
-        return redirect('/admin_gallery')
+        if request.form.get('btn_identifier') == 'delete':
+            mediaid = request.form.get('mediaid')
+            delete_db(str(mediaid))
+            return redirect('/admin_gallery')
+        else:
+            mediaid = request.form.get('mediaid')
+            approve_sub(str(mediaid))
+            return redirect('/admin_gallery')
 
     else:
 
@@ -188,7 +200,7 @@ def admin_singleitemview():
             "mediaid":result[0]
         }
         html_code = render_template('admin_singleitemview.html', result=result_dict)
-        response = make_response(html_code, username = username)
+        response = make_response(html_code)
         return response
 
 @app.route('/header', methods=['GET'])

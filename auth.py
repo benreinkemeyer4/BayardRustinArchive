@@ -124,10 +124,10 @@ def callback():
     # if not userinfo_response.json().get('email_verified'):
     #     message = 'User email not available or not verified by Google.'
     #     return message, 400
-    validemails = {"kxli@princeton.edu", "johnsonan299@gmail.com", "sw42@princeton.edu", "al52@princeton.edu", "brr2@princeton.edu", "sc73@princeton.edu", "brcsjqueerlib@gmail.com", "rustincenter@gmail.com"}
+    validemails = {"kxli@princeton.edu", "johnsonan299@gmail.com", "sw42@princeton.edu", "al52@princeton.edu", "brr2@princeton.edu", "sc73@princeton.edu", "brcsjqueerlib@gmail.com", "rustincenter@gmail.com",
+    "seansmoove27@gmail.com"}
     if not userinfo_response.json()['email'] in validemails:
-        message = 'User email not available or not verified by Google.' #CHANGE THIS TO SAY NOT AUTHORIZED AND GO BACK TO HOMEPAGE
-        return message, 400
+        return flask.redirect(flask.url_for('unauthorized_page'))
 
     # Save the user profile data in the session.
 
@@ -142,7 +142,7 @@ def callback():
         userinfo_response.json()['email_verified'])
     flask.session['locale'] = userinfo_response.json()['locale']
 
-    return flask.redirect(flask.url_for('index'))
+    return flask.redirect(flask.url_for('admin_gallery'))
 
 #-----------------------------------------------------------------------
 

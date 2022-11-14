@@ -18,7 +18,7 @@ def main():
 
     try:
         #app.app.run(host='0.0.0.0', port=port, debug=True)
-        app.app.run(host='0.0.0.0',port=port, ssl_context=('cert.pem', 'key.pem'))
+        app.app.run(host='0.0.0.0',port=port, ssl_context=('cert.pem', 'key.pem'), debug=True)
     except Exception as ex:
         print(ex, file=sys.stderr)
         sys.exit(1)
