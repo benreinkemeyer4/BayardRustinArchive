@@ -99,6 +99,7 @@ def upload_media_details():
             "submitter-name": request.form.get('submitter-name'),
             "date_taken": request.form.get('date'),
             "submitter-email": request.form.get('submitter-email'),
+            "media_type": request.form.get('media_type'),
             "tags": request.form.get('tags'),
             "title": request.form.get('title'),
             "description": request.form.get('description'),
@@ -162,7 +163,8 @@ def singleitemview():
             "desc": result[7],
             "submitter-name": result[1],
             "mediaurl": result[8],
-            "tag": result[5]
+            "tag": result[5],
+            "media_type": result[9]
         }
     html_code = render_template('singleitemview.html', result=result_dict)
     response = make_response(html_code)
@@ -197,7 +199,8 @@ def admin_singleitemview():
             "submitter-name": result[1],
             "mediaurl": result[8],
             "tag": result[5],
-            "mediaid":result[0]
+            "mediaid":result[0],
+            "media_type": result[9]
         }
         html_code = render_template('admin_singleitemview.html', result=result_dict)
         response = make_response(html_code)
