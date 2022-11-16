@@ -27,6 +27,8 @@ app.config['MAX_CONTENT_LENGTH'] = MAX_MB * 1024 * 1024
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 media_url = ""
+tags = ["1963 March on Washington for Jobs and Freedom", "Paper", "Pamphlet", "Leaflet", "Video", "Audio", "Essay", "Book", "Photograph", "Research", "Personal", "interaction", "Story", "Speech", "Activism", "Gandhi", "Civil Rights", "LGBTQIA+ rights", "Intersectionality", "Labor Rights", "Voting Rights", "Union", "AFL-CIO", "Black Power", "Organizer", "Martin Luther King", "A. Philip Randolph", "Pacifism", "Quaker", "Protest", "Boycott", "Sit-in", "News", "Queer", "Africa", "Zambia", "Malcolm X", "President Obama", "Southern Christian Leadership Conference", "Freedom Riders", "Medal of Freedom"]
+
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -94,12 +96,17 @@ def index():
 
 @app.route('/upload_media_details', methods=['GET', 'POST'])
 def upload_media_details():
+    global tags
     if request.method == 'POST':
+        user_tags = []
+
+        for index in request.form.getlist('tags'):
+            user_tags.append(tags[int(index)])
         submission = {
             "submitter-name": request.form.get('submitter-name'),
             "date_taken": request.form.get('date'),
             "submitter-email": request.form.get('submitter-email'),
-            "tags": request.form.getlist('tags'),
+            "tags": user_tags,
             "title": request.form.get('title'),
             "description": request.form.get('description'),
             "media_url": media_url,
@@ -111,7 +118,9 @@ def upload_media_details():
         return redirect('/thank_you')
 
 
-    tags = ["1963 March on Washington for Jobs and Freedom", "Paper", "Pamphlet", "Leaflet", "Video", "Audio", "Essay", "Book", "Photograph", "Research", "Personal", "interaction", "Story", "Speech", "Activism", "Gandhi", "Civil Rights", "LGBTQIA+ rights", "Intersectionality", "Labor Rights", "Voting Rights", "Union", "AFL-CIO", "Black Power", "Organizer", "Martin Luther King", "A. Philip Randolph", "Pacifism", "Quaker", "Protest", "Boycott", "Sit-in", "News", "Queer", "Africa", "Zambia", "Malcolm X", "President Obama", "Southern Christian Leadership Conference", "Freedom Riders", "Medal of Freedom"]
+
+
+
 
 
     html_code = render_template('upload_media_details.html', tags = tags)

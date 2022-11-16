@@ -10,7 +10,7 @@ def insert_db(submission):
     date_taken = submission["date_taken"]
     date_uploaded = date.today()
     sub_email = submission["submitter-email"]
-    tags = submission["tags"]
+    tags = ", ".join(submission["tags"])
     title = submission["title"]
     desc = submission["description"]
     media_url = submission["media_url"]
@@ -33,7 +33,7 @@ def insert_db(submission):
         #cursor.execute('''INSERT INTO submissions (name,date_taken,date_uploaded,email,tags,title,description,media_url) VALUES ('Bob Dylan', '1993-03-15','2022-10-29', 'sw42@princeton.edu', 'document', 'test', 'test', 'test');''')
 
         stmt = '''INSERT INTO submissions (name,date_taken,date_uploaded,email,tags,title,description,media_url,media_type) VALUES (%s, %s,%s, %s, %s, %s, %s, %s, %s);'''
-        cursor.execute(stmt, (sub_name, date_taken, date_uploaded, sub_email, tags[0], title, desc, media_url, media_type))
+        cursor.execute(stmt, (sub_name, date_taken, date_uploaded, sub_email, tags, title, desc, media_url, media_type))
         connection.commit()
         print("1 Record inserted successfully")
         # Fetch result

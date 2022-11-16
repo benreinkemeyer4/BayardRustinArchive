@@ -68,7 +68,7 @@
         <br>
         <select class="form-control" id="tags" name="tags" multiple>
           {% for tag in tags %}
-          <option value={{tag}}>{{tag}}</option>
+          <option value={{loop.index0}}>{{tag}}</option>
           {% endfor %}
         </select>
       </div>
