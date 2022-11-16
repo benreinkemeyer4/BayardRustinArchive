@@ -45,7 +45,9 @@
                   {% if result_dict.mediatype == "Image"%}
                   <i class="fa-regular fa-image"></i>
                   {% elif result_dict.mediatype == "Document" %}
-                  <i class="fa-solid fa-file-pdf"></i>
+                  <i class="fa-regular fa-file"></i>
+                  {% elif result_dict.mediatype == "Video" %}
+                  <i class="fa-regular fa-circle-play"></i>
                   {% endif %}
                   {{result_dict.title}}</a></td>
                 <td>{{result_dict.contributor}}</td>

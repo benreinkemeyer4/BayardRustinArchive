@@ -8,6 +8,7 @@ from database.query_singleitem_db import query_singleitem_db
 from database.approve_sub import approve_sub
 from database.delete_db import delete_db
 import auth
+import urllib.parse
 
 import cloudinary_methods
 
@@ -27,7 +28,32 @@ app.config['MAX_CONTENT_LENGTH'] = MAX_MB * 1024 * 1024
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 media_url = ""
-tags = ["1963 March on Washington for Jobs and Freedom", "Paper", "Pamphlet", "Leaflet", "Video", "Audio", "Essay", "Book", "Photograph", "Research", "Personal", "interaction", "Story", "Speech", "Activism", "Gandhi", "Civil Rights", "LGBTQIA+ rights", "Intersectionality", "Labor Rights", "Voting Rights", "Union", "AFL-CIO", "Black Power", "Organizer", "Martin Luther King", "A. Philip Randolph", "Pacifism", "Quaker", "Protest", "Boycott", "Sit-in", "News", "Queer", "Africa", "Zambia", "Malcolm X", "President Obama", "Southern Christian Leadership Conference", "Freedom Riders", "Medal of Freedom"]
+tags = ["1963 March on Washington for Jobs and Freedom", "Paper", "Pamphlet", "Leaflet", "Video", "Audio", "Essay", "Book", "Photograph", "Research", "Personal", "Interaction", "Story", "Speech", "Activism", "Gandhi", "Civil Rights", "LGBTQIA+ rights", "Intersectionality", "Labor Rights", "Voting Rights", "Union", "AFL-CIO", "Black Power", "Organizer", "Martin Luther King", "A. Philip Randolph", "Pacifism", "Quaker", "Protest", "Boycott", "Sit-in", "News", "Queer", "Africa", "Zambia", "Malcolm X", "President Obama", "Southern Christian Leadership Conference", "Freedom Riders", "Medal of Freedom"]
+
+
+
+
+def video_id(value):
+    """
+    Examples:
+    - http://youtu.be/SA2iWivDJiE
+    - http://www.youtube.com/watch?v=_oPAwA_Udwc&feature=feedu
+    - http://www.youtube.com/embed/SA2iWivDJiE
+    - http://www.youtube.com/v/SA2iWivDJiE?version=3&amp;hl=en_US
+    """
+    query = urllib.parse.urlparse(value)
+    if query.hostname == 'youtu.be':
+        return query.path[1:]
+    if query.hostname in ('www.youtube.com', 'youtube.com'):
+        if query.path == '/watch':
+            p = urllib.parse.parse_qs(query.query)
+            return p['v'][0]
+        if query.path[:7] == '/embed/':
+            return query.path.split('/')[2]
+        if query.path[:3] == '/v/':
+            return query.path.split('/')[2]
+    # fail?
+    return None
 
 
 def allowed_file(filename):
@@ -128,6 +154,56 @@ def upload_media_details():
     return response
 
 
+@app.route('/video_instructions', methods=['GET', "POST"])
+def video_instructions():
+    if request.method == 'POST':
+        return redirect(url_for('upload_video_details'))
+
+    html_code = render_template('video_instructions.html')
+    response = make_response(html_code)
+    return response
+
+
+@app.route('/upload_video_details', methods=['GET', 'POST'])
+def upload_video_details():
+    global tags
+    if request.method == 'POST':
+        user_tags = []
+
+        for index in request.form.getlist('tags'):
+            user_tags.append(tags[int(index)])
+        submission = {
+            "submitter-name": request.form.get('submitter-name'),
+            "date_taken": request.form.get('date'),
+            "submitter-email": request.form.get('submitter-email'),
+            "tags": user_tags,
+            "title": request.form.get('title'),
+            "description": request.form.get('description'),
+            "media_url": request.form.get('media-url'),
+            "media_type": "Video"
+        }
+
+        print(submission)
+        insert_db(submission)
+        return redirect('/thank_you')
+
+
+    html_code = render_template('upload_video_details.html', tags = tags)
+    response = make_response(html_code)
+    return response
+
+
+
+
+
+
+
+    html_code = render_template('upload_media_details.html', tags = tags)
+    response = make_response(html_code)
+    return response
+
+
+
 @app.route('/unauthorized_page', methods=['GET'])
 def unauthorized_page():
     html_code = render_template('unauthorized_page.html')
@@ -198,15 +274,38 @@ def singleitemview():
     results = query_singleitem_db(str(mediaid))
 
     result = results[0]
+
+    mediatype = result[9]
+    mediaurl = result[7]
+
+    if mediatype == "Video":
+        youtube_id = video_id(mediaurl)
+        embed_url = "https://www.youtube.com/embed/"+youtube_id
+
+        result_dict = {
+        "title": result[5],
+        "desc": result[6],
+        "submitter-name": result[1],
+        "mediaurl": embed_url,
+        "mediatype": mediatype,
+        "tags": result[10],
+        "mediaid":result[0]
+    }
+        html_code = render_template('admin_singleitemview.html', result_dict=result_dict)
+        response = make_response(html_code)
+        return response
+
+
+
     result_dict = {
-                "title": result[5],
-                "desc": result[6],
-                "submitter-name": result[1],
-                "mediaurl": result[7],
-                "mediatype": result[9],
-                "tags": result[10],
-                "mediaid":result[0]
-            }
+            "title": result[5],
+            "desc": result[6],
+            "submitter-name": result[1],
+            "mediaurl": mediaurl,
+            "mediatype": mediatype,
+            "tags": result[10],
+            "mediaid":result[0]
+        }
     html_code = render_template('singleitemview.html', result_dict=result_dict)
     response = make_response(html_code)
     return response
@@ -234,12 +333,35 @@ def admin_singleitemview():
         result = results[0]
         print(result)
 
+        mediatype = result[9]
+        mediaurl = result[7]
+
+        if mediatype == "Video":
+            youtube_id = video_id(mediaurl)
+            embed_url = "https://www.youtube.com/embed/"+youtube_id
+
+            result_dict = {
+            "title": result[5],
+            "desc": result[6],
+            "submitter-name": result[1],
+            "mediaurl": embed_url,
+            "mediatype": mediatype,
+            "tags": result[10],
+            "mediaid":result[0]
+        }
+            html_code = render_template('admin_singleitemview.html', result_dict=result_dict)
+            response = make_response(html_code)
+            return response
+
+
+
+
         result_dict = {
             "title": result[5],
             "desc": result[6],
             "submitter-name": result[1],
-            "mediaurl": result[7],
-            "mediatype": result[9],
+            "mediaurl": mediaurl,
+            "mediatype": mediatype,
             "tags": result[10],
             "mediaid":result[0]
         }

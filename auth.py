@@ -19,9 +19,9 @@ GOOGLE_DISCOVERY_URL = (
     'https://accounts.google.com/.well-known/openid-configuration')
 
 # GOOGLE_CLIENT_ID = os.environ['GOOGLE_CLIENT_ID']
-GOOGLE_CLIENT_ID = "926114305336-0sek55oj5a8bnnshig87gvf6gnb8mbqe.apps.googleusercontent.com"
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
 #GOOGLE_CLIENT_SECRET = os.environ['GOOGLE_CLIENT_SECRET']
-GOOGLE_CLIENT_SECRET = "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"
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
 
 client = oauthlib.oauth2.WebApplicationClient(GOOGLE_CLIENT_ID)
 
