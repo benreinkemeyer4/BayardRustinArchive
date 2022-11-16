@@ -14,6 +14,8 @@ def insert_db(submission):
     title = submission["title"]
     desc = submission["description"]
     media_url = submission["media_url"]
+    media_type = submission["media_type"]
+
 
     try:
         up.uses_netloc.append("postgres")
@@ -30,8 +32,8 @@ def insert_db(submission):
         # Executing a SQL query
         #cursor.execute('''INSERT INTO submissions (name,date_taken,date_uploaded,email,tags,title,description,media_url) VALUES ('Bob Dylan', '1993-03-15','2022-10-29', 'sw42@princeton.edu', 'document', 'test', 'test', 'test');''')
 
-        stmt = '''INSERT INTO submissions (name,date_taken,date_uploaded,email,tags,title,description,media_url) VALUES (%s, %s,%s, %s, %s, %s, %s, %s);'''
-        cursor.execute(stmt, (sub_name, date_taken, date_uploaded, sub_email, tags, title, desc, media_url))
+        stmt = '''INSERT INTO submissions (name,date_taken,date_uploaded,email,tags,title,description,media_url,media_type) VALUES (%s, %s,%s, %s, %s, %s, %s, %s, %s);'''
+        cursor.execute(stmt, (sub_name, date_taken, date_uploaded, sub_email, tags[0], title, desc, media_url, media_type))
         connection.commit()
         print("1 Record inserted successfully")
         # Fetch result

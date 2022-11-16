@@ -46,15 +46,30 @@
         <label>Submitter Email</label>
         <input name="submitter-email" class="form-control" style="width:50%" required>
       </div>
-    </div>
+      </div>
 
-    <div class="col">
-      <div class="form-group">
-        <label for="tags">Tags</label>
-        <select class="form-control" id="tags" name="tags" required>
+      <div class="col">
+        <div class="form-group">
+          <label for="media_type">Media Type</label>
+          <select class="form-control" id="media_type" name="media_type" required>
           <option>Document</option>
           <option>Image</option>
           <option>Video</option>
+        </select>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="row" style="width:80%;">
+      <div class="col">
+      <div class="form-group">
+        <label for="tags">Tags</label>
+        <br>
+        <select class="form-control" id="tags" name="tags" multiple>
+          {% for tag in tags %}
+          <option value={{tag}}>{{tag}}</option>
+          {% endfor %}
         </select>
       </div>
       </div>

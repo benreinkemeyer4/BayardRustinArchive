@@ -26,12 +26,12 @@
         <div style="display: flex; margin-top:10%">
           <form method="post" action="/admin_details">
             <input name="btn_identifier" value="delete" type="hidden">
-            <input name="mediaid" value="{{result.mediaid}}" type="hidden">
+            <input name="mediaid" value="{{result_dict.mediaid}}" type="hidden">
             <input type="submit" name="delete" value="Delete">
         </form>
             <form method="post" action="/admin_details">
                 <input name="btn_identifier" value="approve" type="hidden">
-                <input name="mediaid" value="{{result.mediaid}}" type="hidden">
+                <input name="mediaid" value="{{result_dict.mediaid}}" type="hidden">
                 <input type="submit" name="approve" value="Approve">
             </form>
         </div>
@@ -39,17 +39,17 @@
     <div style="display: flex;
     align-items: center;
     justify-content: center; flex-direction: column;">
-    <h2>{{result["title"]}}</h2>
+    <h2>{{result_dict["title"]}}</h2>
 
-    <strong>Description: </strong>{{result["desc"]}}<br>
+    <strong>Description: </strong>{{result_dict["desc"]}}<br>
 
-    <strong>Contributor Names: </strong>{{result["submitter-name"]}}<br>
+    <strong>Contributor Names: </strong>{{result_dict["submitter-name"]}}<br>
 
 
-    {% if result["tag"] == "Image"%}
-    <img src="{{result.mediaurl}}"/>
-    {% elif result["tag"] == "Document" %}
-    <embed src="{{result.mediaurl}}" width="800px" height="2100px" />
+    {% if result_dict["mediatype"] == "Image"%}
+    <img src="{{result_dict.mediaurl}}"/>
+    {% elif result_dict["mediatype"] == "Document" %}
+    <embed src="{{result_dict.mediaurl}}" width="800px" height="2100px" />
     {% endif %}
 
     </div>

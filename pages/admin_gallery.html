@@ -33,23 +33,25 @@
                 <th>Contributor</th>
                 <th>Upload Date</th>
                 <th>Media Type</th>
+                <th>Tags</th>
                 <th>Approved</th>
               </tr>
             </thead>
             <tbody>
-              {% for result in results: %}
+              {% for result_dict in results_dict_list: %}
               <tr>
-                <td><a href="/admin_details?mediaid={{result[0]}}">
-                  {% if result[5] == "Image"%}
+                <td><a href="/admin_details?mediaid={{result_dict.id}}">
+                  {% if result_dict.mediatype == "Image"%}
                   <i class="fa-regular fa-image"></i>
-                  {% elif result[5] == "Document" %}
+                  {% elif result_dict.mediatype == "Document" %}
                   <i class="fa-solid fa-file-pdf"></i>
                   {% endif %}
-                  {{result[6]}}</a></td>
-                <td>{{result[1]}}</td>
-                <td>{{result[3]}}</td>
-                <td>{{result[5]}}</td>
-                <td>{{result[9]}}</td>
+                  {{result_dict.title}}</a></td>
+                <td>{{result_dict.contributor}}</td>
+                <td>{{result_dict.uploaddate}}</td>
+                <td>{{result_dict.mediatype}}</td>
+                <td>{{result_dict.tags}}</td>
+                <td>{{result_dict.approved}}</td>
               </tr>
             {% endfor %}
 

@@ -99,16 +99,22 @@ def upload_media_details():
             "submitter-name": request.form.get('submitter-name'),
             "date_taken": request.form.get('date'),
             "submitter-email": request.form.get('submitter-email'),
-            "tags": request.form.get('tags'),
+            "tags": request.form.getlist('tags'),
             "title": request.form.get('title'),
             "description": request.form.get('description'),
-            "media_url": media_url
+            "media_url": media_url,
+            "media_type": request.form.get('media_type')
         }
+
         print(submission)
         insert_db(submission)
         return redirect('/thank_you')
 
-    html_code = render_template('upload_media_details.html')
+
+    tags = ["1963 March on Washington for Jobs and Freedom", "Paper", "Pamphlet", "Leaflet", "Video", "Audio", "Essay", "Book", "Photograph", "Research", "Personal", "interaction", "Story", "Speech", "Activism", "Gandhi", "Civil Rights", "LGBTQIA+ rights", "Intersectionality", "Labor Rights", "Voting Rights", "Union", "AFL-CIO", "Black Power", "Organizer", "Martin Luther King", "A. Philip Randolph", "Pacifism", "Quaker", "Protest", "Boycott", "Sit-in", "News", "Queer", "Africa", "Zambia", "Malcolm X", "President Obama", "Southern Christian Leadership Conference", "Freedom Riders", "Medal of Freedom"]
+
+
+    html_code = render_template('upload_media_details.html', tags = tags)
     response = make_response(html_code)
     return response
 
@@ -129,18 +135,49 @@ def thank_you():
 def gallery():
     results = query_db()
     print(results)
+    results_dict_list = []
+    for result in results:
+        result_dict = {
+            "title": result[5],
+            "contributor": result[1],
+            "uploaddate": result[3],
+            "mediatype": result[9],
+            "tags": result[10],
+            "approved": result[8],
+            "id": result[0]
+        }
+        results_dict_list.append(result_dict)
     html_code = render_template('gallery.html', \
-        results = results)
+        results_dict_list = results_dict_list
+
+        )
     response = make_response(html_code)
     return response
 
 @app.route('/admin_gallery', methods=['GET'])
 def admin_gallery():
+    # id, name, date created, date submitted, email, title, description, media url, approved, media_type, tags
+    # 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
     username = auth.authenticate()
     results = query_db()
     print(results)
+
+    results_dict_list = []
+    for result in results:
+        result_dict = {
+            "title": result[5],
+            "contributor": result[1],
+            "uploaddate": result[3],
+            "mediatype": result[9],
+            "tags": result[10],
+            "approved": result[8],
+            "id": result[0]
+        }
+        results_dict_list.append(result_dict)
+
+
     html_code = render_template('admin_gallery.html', \
-        results = results)
+        results_dict_list = results_dict_list)
     response = make_response(html_code)
     return response
 
@@ -151,20 +188,17 @@ def singleitemview():
     print(mediaid)
     results = query_singleitem_db(str(mediaid))
 
-    result_dict = {}
-    if results:
-        result = results[0]
-
-        print(result)
-
-        result_dict = {
-            "title": result[6],
-            "desc": result[7],
-            "submitter-name": result[1],
-            "mediaurl": result[8],
-            "tag": result[5]
-        }
-    html_code = render_template('singleitemview.html', result=result_dict)
+    result = results[0]
+    result_dict = {
+                "title": result[5],
+                "desc": result[6],
+                "submitter-name": result[1],
+                "mediaurl": result[7],
+                "mediatype": result[9],
+                "tags": result[10],
+                "mediaid":result[0]
+            }
+    html_code = render_template('singleitemview.html', result_dict=result_dict)
     response = make_response(html_code)
     return response
 
@@ -192,14 +226,15 @@ def admin_singleitemview():
         print(result)
 
         result_dict = {
-            "title": result[6],
-            "desc": result[7],
+            "title": result[5],
+            "desc": result[6],
             "submitter-name": result[1],
-            "mediaurl": result[8],
-            "tag": result[5],
+            "mediaurl": result[7],
+            "mediatype": result[9],
+            "tags": result[10],
             "mediaid":result[0]
         }
-        html_code = render_template('admin_singleitemview.html', result=result_dict)
+        html_code = render_template('admin_singleitemview.html', result_dict=result_dict)
         response = make_response(html_code)
         return response
 
