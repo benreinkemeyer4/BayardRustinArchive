@@ -291,7 +291,7 @@ def singleitemview():
         "tags": result[10],
         "mediaid":result[0]
     }
-        html_code = render_template('admin_singleitemview.html', result_dict=result_dict)
+        html_code = render_template('singleitemview.html', result_dict=result_dict)
         response = make_response(html_code)
         return response
 
