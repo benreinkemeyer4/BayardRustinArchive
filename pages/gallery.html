@@ -18,14 +18,16 @@
       </script>
 
   </head>
-  <body style="font-family: 'American Typewriter', sans-serif;">
-    {% include 'header.html' %}
-
+  <body>
+    <div class="container-fluid">
+      {% include 'header.html' %}
+    </div>
+    
 
     <center>
-    <div style="margin-top:10%">
+    <div class = "container-fluid" style="margin-top:10%">
       <h1>Gallery</h1>
-
+  
     <div action="/gallery" method="get" style="width:90%; margin-top: 2%;" class="table-hover">
         <table class="table table-striped" id="gallery">
             <thead class="bg-primary" style = "color: white;" >
