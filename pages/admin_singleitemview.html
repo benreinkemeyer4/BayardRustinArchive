@@ -21,11 +21,12 @@
 
 </head>
 
-    <body style="background-color: #E6E3D3; font-family: 'American Typewriter', sans-serif;">
+    <body>
       {% include 'header.html' %}
 
-
-        <div style="display: flex; margin-top:10%">
+      <div style="margin-top: 200px;display: flex;
+      align-items: center;
+      justify-content: center; flex-direction: column;">
           <form method="post" action="/admin_details">
             <input name="btn_identifier" value="delete" type="hidden">
             <input name="mediaid" value="{{result_dict.mediaid}}" type="hidden">
@@ -59,6 +60,11 @@
     {% endif %}
 
     </div>
+
+    
+    <!----
+    <a href = "https://www.boredbutton.com/">Link</a>
+    -->
 
 
 

@@ -16,14 +16,14 @@
     "https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js">
  </script>
 </head>
-<body style = "font-family: 'American Typewriter', sans-serif;">
+<body>
     {% include 'header.html' %}
 
 
-    <div style="margin-left: 20%; height: 500px; margin-top:10%">
+    <div style="margin-left: 20%; height: 500px; margin-top:10%;">
     <h1>Media Upload</h1>
     <hr>
-    <p>
+    <p style="background-color:rgba(156, 122, 0, 0.08)">
       {% with messages = get_flashed_messages() %}
         {% if messages %}
          <ul class=flashes>
@@ -36,10 +36,10 @@
    </p>
 
       <div style="height:100%; width:80%; outline-style:dashed; outline-color:#DCAC00; border-radius:30px;
-      display: flex; align-items: center; justify-content: center; background-color:rgba(156, 122, 0, 0.08)">
-         <form action="/" method="post" enctype="multipart/form-data">
-            <p>Upload a file with the file dialog</p>
-            <input type="file" name="file" autocomplete="off" required>
+      display: flex; align-items: center; justify-content: center; background-color:#fef1c1">
+         <form action="/" method="post" enctype="multipart/form-data" style = "background-color:#fef1c1">
+            <p style = "background-color:#fef1c1">Upload a file with the file dialog</p>
+            <input style= "background-color:#fef1c1"type="file" name="file" autocomplete="off" required>
             <button type="submit" class="btn btn-primary">Next</button>
 
           </form>
