@@ -12,10 +12,12 @@ import urllib.parse
 import os
 #from flask_mail import Mail, Message
 #try 2 of sending mail
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-import smtplib
-import ssl
+# from email.mime.multipart import MIMEMultipart
+# from email.mime.text import MIMEText
+# import smtplib
+# import ssl
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 import cloudinary_methods
 
@@ -36,73 +38,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 media_url = ""
 tags = ["1963 March on Washington for Jobs and Freedom", "Paper", "Pamphlet", "Leaflet", "Video", "Audio", "Essay", "Book", "Photograph", "Research", "Personal", "Interaction", "Story", "Speech", "Activism", "Gandhi", "Civil Rights", "LGBTQIA+ rights", "Intersectionality", "Labor Rights", "Voting Rights", "Union", "AFL-CIO", "Black Power", "Organizer", "Martin Luther King", "A. Philip Randolph", "Pacifism", "Quaker", "Protest", "Boycott", "Sit-in", "News", "Queer", "Africa", "Zambia", "Malcolm X", "President Obama", "Southern Christian Leadership Conference", "Freedom Riders", "Medal of Freedom"]
 
-#config emailing way 1-------- DOESNT WORK
-# app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-# app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-# app.config['MAIL_SERVER']='smtp.gmail.com'
-# app.config['MAIL_PORT'] = 465
-# app.config['MAIL_USE_TLS'] = False
-# app.config['MAIL_USE_SSL'] = True # True if Port = 465
-#mail = Mail(app)
-#config emailing way 1 END-------- DOESNT WORK
-
-
-#try 2 w/smtp --------------
-# smtp_server = "smtp.gmail.com"
-# port = 587  # For starttls
-
-# sender_email = "bayardrustinarchive@gmail.com" # email address used to generate password
-# receiver_email = ["kathyli4735@gmail.com"] # a list of recipients 
-# password = "mrhvxqutbwztalxa" # the 16 code generated
-# # if you store credentials as env variables 
-# # password = os.environ['EMAIL_CRED']
-
-# msg = MIMEMultipart()
-# msg["Subject"] = "[Bayard Rustin Archive] Update"
-# msg["From"] = sender_email
-# msg['To'] = ", ".join(receiver_email)
-
-# ## Plain text
-# text = """\
-# This line is to demonstrate sending plain text."""
-
-# body_text = MIMEText(text, 'plain')  # 
-# msg.attach(body_text)  # attaching the text body into msg
-
-# html = """\
-# <html>
-#   <body>
-#     <p>Hi,<br>
-#     <br>
-#     This is to inform the training job has been completed. The AUC for the job on <br>
-#     Thank you. <br>
-#     </p>
-#   </body>
-# </html>
-# """
-
-# body_html = MIMEText(html.format(), 'html')  # parse values into html text
-# msg.attach(body_html)  # attaching the text body into msg
-
-# context = ssl.create_default_context()
-# # Try to log in to server and send email 
-# try:
-#     server = smtplib.SMTP(smtp_server, port)
-#     server.ehlo()  # check connection
-#     server.starttls(context=context)  # Secure the connection
-#     server.ehlo()  # check connection
-#     server.login(sender_email, password)
-
-#     # Send email here
-#     server.sendmail(sender_email, receiver_email, msg.as_string())
-
-# except Exception as e:
-#     # Print any error messages 
-#     print(e)
-# finally:
-#     server.quit()
-
-#try 2 w/smtp end --------------
 
 def video_id(value):
     """
@@ -153,10 +88,19 @@ def logoutgoogle():
 @app.route('/', methods=['GET','POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-    #emailing steps
-    # msg = Message('[Bayard Rustin Archive] Update', sender = 'bayardrustinarchive@gmail.com', recipients = ['kathyli4735@gmail.com'])
-    # msg.body = "New Upload to Bayard Rustin Archive"
-    #mail.send(msg) #doesnt work
+    #try 3: sendgrid doesnt work rn because certificate verify failed: unable to get local issuer certificate (_ssl.c:997)>
+    # message = Mail(
+    #     from_email='bayardrustinarchive@gmail.com',
+    #     to_emails='kathyli4735@gmail.com',
+    #     subject='Sending with Twilio SendGrid is easy',
+    #     html_content='<strong>Even with Python</strong>')
+
+    # #sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
+    # sg = SendGridAPIClient("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")
+    # response = sg.send(message)
+    # print(response.status_code, response.body, response.headers) 
+    #------try 3 end
+
 
 
     if request.method == 'POST':
