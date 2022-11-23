@@ -3,7 +3,6 @@
 import sys
 import app
 
-
 def main():
 
     if len(sys.argv) != 2:
