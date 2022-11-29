@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="google-site-verification" content="GBxAGe42QLcQrLsXy3n01w8oQD9AAqrlC9ORHPl57-4" />
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<link href=https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.20/css/dataTables.bootstrap4.min.css rel=stylesheet>
+<script src="https://kit.fontawesome.com/d630d1cdd4.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="./static/style.css">
+
+    <title>Bayard Rustin Archive</title>
+    <script src=
+    "https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js">
+ </script>
+</head>
+<body>
+    {% include 'header.html' %}
+
+
+    <div style="margin-left: 20%; height: 500px; margin-top:10%;">
+    <h1>Media Upload</h1>
+    <hr>
+    <p style="background-color:rgba(156, 122, 0, 0.08)">
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+         <ul class=flashes>
+         {% for message in messages %}
+           <li>{{ message }}</li>
+         {% endfor %}
+         </ul>
+        {% endif %}
+      {% endwith %}
+   </p>
+
+      <div class = "container-fluid"style="height:100%; width:80%; outline-style:dashed; outline-color:#DCAC00; border-radius:30px;
+      display: flex; align-items: center; justify-content: center; background-color:#fef1c1">
+         <form action="/" method="post" enctype="multipart/form-data" style = "background-color:#fef1c1">
+            <p style = "background-color:#fef1c1">Upload a file with the file dialog</p>
+            <input style= "background-color:#fef1c1"type="file" name="file" autocomplete="off" required>
+            <button type="submit" class="btn btn-primary">Next</button>
+
+          </form>
+
+      </div>
+
+
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+  </body>
+</html>

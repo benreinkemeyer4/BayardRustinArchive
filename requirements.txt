@@ -1,0 +1,10 @@
+Flask==2.2.2
+psycopg2==2.9.5
+Werkzeug==2.2.2
+Gunicorn
+cloudinary==1.25.0
+requests
+oauthlib==3.0.1
+Flask-Login==0.4.1
+pyOpenSSL==22.0.0
+python-dotenv
