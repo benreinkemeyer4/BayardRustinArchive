@@ -15,12 +15,12 @@
  </script>
 
 </head>
-<body style="background-color: #E6E3D3; font-family: 'American Typewriter', sans-serif;">
+<body style="font-family: 'American Typewriter', sans-serif;">
   {% include 'header.html' %}
 
     <div style="margin-left: 20%;margin-top:12%">
     <h1>Video Details</h1>
-    <hr>
+    <br>
 
     <form action="/upload_video_details" method="post">
 
@@ -91,6 +91,10 @@
       </div>
     </div>
     </div>
+
+    {{ recaptcha }}
+
+    <p>{{ message }}</p>
 
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>

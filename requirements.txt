@@ -9,3 +9,5 @@ Flask-Login==0.4.1
 pyOpenSSL==22.0.0
 python-dotenv
 sendgrid
+Flask-reCaptcha==0.4.2
+jinja2==3.0.0

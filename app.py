@@ -18,6 +18,9 @@ import os
 # import ssl
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+from flask_recaptcha import ReCaptcha # Import ReCaptcha object
+
+
 
 import cloudinary_methods
 
@@ -34,6 +37,13 @@ MAX_MB = 10
 app.config['MAX_CONTENT_LENGTH'] = MAX_MB * 1024 * 1024
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+app.config['RECAPTCHA_ENABLE'] = True
+app.config['RECAPTCHA_SITE_KEY'] = '6LfwBSkjAAAAAEyt-PsS-GxKSfyVWT4jo882WD6R' # <-- Add your site key
+app.config['RECAPTCHA_SECRET_KEY'] = '6LfwBSkjAAAAAFJf6CN8M2G-_NZm8AaN1pSjYdwm' # <-- Add your secret key
+recaptcha = ReCaptcha(app) # Create a ReCaptcha object by passing in 'app' as parameter
+
+
 
 media_url = ""
 tags = ["1963 March on Washington for Jobs and Freedom", "Paper", "Pamphlet", "Leaflet", "Video", "Audio", "Essay", "Book", "Photograph", "Research", "Personal", "Interaction", "Story", "Speech", "Activism", "Gandhi", "Civil Rights", "LGBTQIA+ rights", "Intersectionality", "Labor Rights", "Voting Rights", "Union", "AFL-CIO", "Black Power", "Organizer", "Martin Luther King", "A. Philip Randolph", "Pacifism", "Quaker", "Protest", "Boycott", "Sit-in", "News", "Queer", "Africa", "Zambia", "Malcolm X", "President Obama", "Southern Christian Leadership Conference", "Freedom Riders", "Medal of Freedom"]
@@ -98,7 +108,7 @@ def index():
     # #sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
     # sg = SendGridAPIClient("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")
     # response = sg.send(message)
-    # print(response.status_code, response.body, response.headers) 
+    # print(response.status_code, response.body, response.headers)
     #------try 3 end
 
 
@@ -144,35 +154,34 @@ def index():
 @app.route('/upload_media_details', methods=['GET', 'POST'])
 def upload_media_details():
     global tags
+    message=""
     if request.method == 'POST':
-        user_tags = []
+        if recaptcha.verify(): # Use verify() method to see if ReCaptcha is filled out
+            user_tags = []
+            for index in request.form.getlist('tags'):
+                user_tags.append(tags[int(index)])
+            submission = {
+                "submitter-name": request.form.get('submitter-name'),
+                "date_taken": request.form.get('date'),
+                "submitter-email": request.form.get('submitter-email'),
+                "tags": user_tags,
+                "title": request.form.get('title'),
+                "description": request.form.get('description'),
+                "media_url": request.form.get('media-url'),
+                "media_type": request.form.get('media_type')
+            }
 
-        for index in request.form.getlist('tags'):
-            user_tags.append(tags[int(index)])
-        submission = {
-            "submitter-name": request.form.get('submitter-name'),
-            "date_taken": request.form.get('date'),
-            "submitter-email": request.form.get('submitter-email'),
-            "tags": user_tags,
-            "title": request.form.get('title'),
-            "description": request.form.get('description'),
-            "media_url": media_url,
-            "media_type": request.form.get('media_type')
-        }
-
-        print(submission)
-        insert_db(submission)
-        return redirect('/thank_you')
-
-
-
-
+            print(submission)
+            insert_db(submission)
+            return redirect('/thank_you')
+        else:
+            message = 'Please fill out the ReCaptcha!' # Send error message
 
 
-
-    html_code = render_template('upload_media_details.html', tags = tags)
+    html_code = render_template('upload_media_details.html', tags = tags, message=message)
     response = make_response(html_code)
     return response
+
 
 
 @app.route('/video_instructions', methods=['GET', "POST"])
@@ -188,28 +197,31 @@ def video_instructions():
 @app.route('/upload_video_details', methods=['GET', 'POST'])
 def upload_video_details():
     global tags
+    message=""
     if request.method == 'POST':
-        user_tags = []
+        if recaptcha.verify(): # Use verify() method to see if ReCaptcha is filled out
+            user_tags = []
+            for index in request.form.getlist('tags'):
+                user_tags.append(tags[int(index)])
+            submission = {
+                "submitter-name": request.form.get('submitter-name'),
+                "date_taken": request.form.get('date'),
+                "submitter-email": request.form.get('submitter-email'),
+                "tags": user_tags,
+                "title": request.form.get('title'),
+                "description": request.form.get('description'),
+                "media_url": request.form.get('media-url'),
+                "media_type": "Video"
+            }
 
-        for index in request.form.getlist('tags'):
-            user_tags.append(tags[int(index)])
-        submission = {
-            "submitter-name": request.form.get('submitter-name'),
-            "date_taken": request.form.get('date'),
-            "submitter-email": request.form.get('submitter-email'),
-            "tags": user_tags,
-            "title": request.form.get('title'),
-            "description": request.form.get('description'),
-            "media_url": request.form.get('media-url'),
-            "media_type": "Video"
-        }
-
-        print(submission)
-        insert_db(submission)
-        return redirect('/thank_you')
+            print(submission)
+            insert_db(submission)
+            return redirect('/thank_you')
+        else:
+            message = 'Please fill out the ReCaptcha!' # Send error message
 
 
-    html_code = render_template('upload_video_details.html', tags = tags)
+    html_code = render_template('upload_video_details.html', tags = tags, message=message)
     response = make_response(html_code)
     return response
 
