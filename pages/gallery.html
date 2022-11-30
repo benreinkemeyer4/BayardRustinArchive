@@ -22,15 +22,15 @@
     <div class="container-fluid">
       {% include 'header.html' %}
     </div>
-    
+
 
     <center>
     <div class = "container-fluid" style="margin-top:10%">
       <h1>Gallery</h1>
-  
+
     <div action="/gallery" method="get" style="width:90%; margin-top: 2%;" class="table-hover">
         <table class="table table-striped" id="gallery">
-            <thead class="bg-primary" style = "color: white;" >
+            <thead class="bg-primary">
               <tr>
                 <th>Title</th>
                 <th>Contributor</th>
@@ -83,13 +83,13 @@
           .clone(true)
           .addClass('filters')
           .appendTo('#gallery thead'));
-  
+
       var table = $('#gallery').DataTable({
           orderCellsTop: true,
           fixedHeader: true,
           initComplete: function () {
               var api = this.api();
-  
+
               // For each column
               api
                   .columns()
@@ -100,8 +100,8 @@
                           $(api.column(colIdx).header()).index()
                       );
                       var title = $(cell).text();
-                      $(cell).html('<input type="text" placeholder="' + title + '" />');
-  
+                      $(cell).html('<input type="text"/>');
+
                       // On every keypress in this input
                       $(
                           'input',
@@ -112,7 +112,7 @@
                               // Get the search value
                               $(this).attr('title', $(this).val());
                               var regexr = '({search})'; //$(this).parents('th').find('select').val();
-  
+
                               var cursorPosition = this.selectionStart;
                               // Search the column for that value
                               api
@@ -128,7 +128,7 @@
                           })
                           .on('keyup', function (e) {
                               e.stopPropagation();
-  
+
                               $(this).trigger('change');
                               $(this)
                                   .focus()[0]
@@ -136,7 +136,7 @@
                           });
                   });
           },
-      });  
+      });
     });
     </script>
 

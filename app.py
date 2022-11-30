@@ -24,7 +24,7 @@ from flask_recaptcha import ReCaptcha # Import ReCaptcha object
 
 import cloudinary_methods
 
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'jpg', 'jpeg'}
+ALLOWED_EXTENSIONS = {'pdf', 'jpg', 'jpeg'}
 UPLOAD_FOLDER = './uploads'
 
 
@@ -32,9 +32,6 @@ UPLOAD_FOLDER = './uploads'
 app = Flask(__name__, template_folder='./pages')
 app.secret_key = "secret key"
 
-MAX_MB = 10
-#It will allow below 10MB contents only, you can change it
-app.config['MAX_CONTENT_LENGTH'] = MAX_MB * 1024 * 1024
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -46,6 +43,8 @@ recaptcha = ReCaptcha(app) # Create a ReCaptcha object by passing in 'app' as pa
 
 
 media_url = ""
+media_type = ""
+
 tags = ["1963 March on Washington for Jobs and Freedom", "Paper", "Pamphlet", "Leaflet", "Video", "Audio", "Essay", "Book", "Photograph", "Research", "Personal", "Interaction", "Story", "Speech", "Activism", "Gandhi", "Civil Rights", "LGBTQIA+ rights", "Intersectionality", "Labor Rights", "Voting Rights", "Union", "AFL-CIO", "Black Power", "Organizer", "Martin Luther King", "A. Philip Randolph", "Pacifism", "Quaker", "Protest", "Boycott", "Sit-in", "News", "Queer", "Africa", "Zambia", "Malcolm X", "President Obama", "Southern Christian Leadership Conference", "Freedom Riders", "Medal of Freedom"]
 
 
@@ -129,18 +128,37 @@ def index():
             return redirect(request.url)
 
         if file and allowed_file(file.filename):
-            #upload to cloudinary
-            url = cloudinary_methods.upload(file)
 
-            global media_url
-            media_url = url
+            extension = file.filename.rsplit('.', 1)[1].lower()
+            print(extension)
+            if extension == "pdf":
+                type = "Document"
+            else:
+                type = "Image"
+
+            file.seek(0, os.SEEK_END)
+            file_length = file.tell()
+            print(file_length)
+
+            if file_length > 10000000:
+                flash('Maximum file size is 10 MB (megabytes)')
+                return redirect(request.url)
+            else:
+                file.seek(0)
+                #upload to cloudinary
+                url = cloudinary_methods.upload(file)
+
+                global media_url
+                global media_type
+                media_url = url
+                media_type = type
 
 
-            print('File successfully uploaded')
-            return redirect(url_for('upload_media_details'))
+                print('File successfully uploaded')
+                return redirect(url_for('upload_media_details'))
         else:
-            print('Allowed file types are txt, pdf, jpg, jpeg')
-            flash('Allowed file types are txt, pdf, jpg, jpeg')
+            print('Allowed file types are pdf, jpg, jpeg')
+            flash('Allowed file types are pdf, jpg, jpeg')
             return redirect(request.url)
 
 
@@ -164,11 +182,12 @@ def upload_media_details():
                 "submitter-name": request.form.get('submitter-name'),
                 "date_taken": request.form.get('date'),
                 "submitter-email": request.form.get('submitter-email'),
+                "submitter-pronouns": request.form.get('submitter-pronouns'),
                 "tags": user_tags,
                 "title": request.form.get('title'),
                 "description": request.form.get('description'),
-                "media_url": request.form.get('media-url'),
-                "media_type": request.form.get('media_type')
+                "media_url": media_url,
+                "media_type": media_type
             }
 
             print(submission)
@@ -211,7 +230,9 @@ def upload_video_details():
                 "title": request.form.get('title'),
                 "description": request.form.get('description'),
                 "media_url": request.form.get('media-url'),
-                "media_type": "Video"
+                "media_type": "Video",
+                "submitter-pronouns": request.form.get('submitter-pronouns'),
+
             }
 
             print(submission)
@@ -381,7 +402,8 @@ def admin_singleitemview():
             "mediaurl": embed_url,
             "mediatype": mediatype,
             "tags": result[10],
-            "mediaid":result[0]
+            "mediaid":result[0],
+            "submitter-pronouns":result[11]
         }
             html_code = render_template('admin_singleitemview.html', result_dict=result_dict)
             response = make_response(html_code)
@@ -398,7 +420,8 @@ def admin_singleitemview():
             "mediaurl": mediaurl,
             "mediatype": mediatype,
             "tags": result[10],
-            "mediaid":result[0]
+            "mediaid":result[0],
+            "submitter-pronouns":result[11]
         }
         html_code = render_template('admin_singleitemview.html', result_dict=result_dict)
         response = make_response(html_code)
