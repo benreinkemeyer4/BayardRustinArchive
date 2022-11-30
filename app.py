@@ -19,7 +19,7 @@ import os
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from flask_recaptcha import ReCaptcha # Import ReCaptcha object
-
+from validate_email import validate_email
 
 
 import cloudinary_methods
@@ -248,13 +248,6 @@ def upload_video_details():
 
 
 
-
-
-
-
-    html_code = render_template('upload_media_details.html', tags = tags)
-    response = make_response(html_code)
-    return response
 
 
 

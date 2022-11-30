@@ -44,9 +44,11 @@
       <div class="col">
       <div class="form-group">
         <label>Submitter Email</label>
-        <input name="submitter-email" class="form-control" style="width:50%" required maxlength="70">
+        <input type="email" name="submitter-email" class="form-control" style="width:50%" required maxlength="70"
+        pattern="/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/">
       </div>
       </div>
+
 
       <div class="col">
         <div class="form-group">
