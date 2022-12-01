@@ -10,16 +10,9 @@ from database.delete_db import delete_db
 import auth
 import urllib.parse
 import os
-#from flask_mail import Mail, Message
-#try 2 of sending mail
-# from email.mime.multipart import MIMEMultipart
-# from email.mime.text import MIMEText
-# import smtplib
-# import ssl
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
+from flask_mail import Mail, Message
+
 from flask_recaptcha import ReCaptcha # Import ReCaptcha object
-from validate_email import validate_email
 
 
 import cloudinary_methods
@@ -31,6 +24,16 @@ UPLOAD_FOLDER = './uploads'
 # current directory
 app = Flask(__name__, template_folder='./pages')
 app.secret_key = "secret key"
+
+mail = Mail(app)
+#mail config
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+mail = Mail(app)
 
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -97,21 +100,6 @@ def logoutgoogle():
 @app.route('/', methods=['GET','POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-    #try 3: sendgrid doesnt work rn because certificate verify failed: unable to get local issuer certificate (_ssl.c:997)>
-    # message = Mail(
-    #     from_email='bayardrustinarchive@gmail.com',
-    #     to_emails='kathyli4735@gmail.com',
-    #     subject='Sending with Twilio SendGrid is easy',
-    #     html_content='<strong>Even with Python</strong>')
-
-    # #sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-    # sg = SendGridAPIClient("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")
-    # response = sg.send(message)
-    # print(response.status_code, response.body, response.headers)
-    #------try 3 end
-
-
-
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -192,6 +180,13 @@ def upload_media_details():
 
             print(submission)
             insert_db(submission)
+            msg = Message(
+                '[Bayard Rustin Archive] New Upload',
+                sender ='bayardrustinarchive@gmail.com',
+                recipients = ['bayardrustinarchive@gmail.com'] #change to their actual emails eventually
+               )
+            msg.body = 'There is a new upload to the Bayard Rustin Archive! View it here: https://bayard-rustin-archive-web.onrender.com/'
+            mail.send(msg)
             return redirect('/thank_you')
         else:
             message = 'Please fill out the ReCaptcha!' # Send error message
@@ -237,6 +232,13 @@ def upload_video_details():
 
             print(submission)
             insert_db(submission)
+            msg = Message(
+            '[Bayard Rustin Archive] New Upload',
+            sender ='bayardrustinarchive@gmail.com',
+            recipients = ['bayardrustinarchive@gmail.com'] #change to their actual emails eventually
+            )
+            msg.body = 'There is a new upload to the Bayard Rustin Archive! View it here: https://bayard-rustin-archive-web.onrender.com/'
+            mail.send(msg)
             return redirect('/thank_you')
         else:
             message = 'Please fill out the ReCaptcha!' # Send error message
@@ -245,10 +247,6 @@ def upload_video_details():
     html_code = render_template('upload_video_details.html', tags = tags, message=message)
     response = make_response(html_code)
     return response
-
-
-
-
 
 
 @app.route('/unauthorized_page', methods=['GET'])
