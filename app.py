@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from flask import Flask, render_template, request, make_response, redirect, flash, url_for
+from flask import Flask, render_template, request, make_response, redirect, flash, url_for, session
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
 from database.query_db import query_db
@@ -11,8 +11,9 @@ import auth
 import urllib.parse
 import os
 from flask_mail import Mail, Message
-
 from flask_recaptcha import ReCaptcha # Import ReCaptcha object
+from twilio.rest import Client
+from dotenv import load_dotenv
 
 
 import cloudinary_methods
@@ -20,7 +21,7 @@ import cloudinary_methods
 ALLOWED_EXTENSIONS = {'pdf', 'jpg', 'jpeg'}
 UPLOAD_FOLDER = './uploads'
 
-
+load_dotenv()
 # current directory
 app = Flask(__name__, template_folder='./pages')
 app.secret_key = "secret key"
@@ -35,6 +36,14 @@ app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
 
+
+# twilio config
+
+TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN= os.environ.get('TWILIO_AUTH_TOKEN')
+TWILIO_VERIFY_SERVICE = os.environ.get('TWILIO_VERIFY_SERVICE')
+SENDGRID_API_KEY= os.environ.get('SENDGRID_API_KEY')
+client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -215,6 +224,12 @@ def upload_video_details():
     if request.method == 'POST':
         if recaptcha.verify(): # Use verify() method to see if ReCaptcha is filled out
             user_tags = []
+
+            to_email = request.form.get('submitter-email')
+            print(to_email)
+            session['to_email'] = to_email
+
+            send_verification(to_email)
             for index in request.form.getlist('tags'):
                 user_tags.append(tags[int(index)])
             submission = {
@@ -248,6 +263,13 @@ def upload_video_details():
     response = make_response(html_code)
     return response
 
+def send_verification(to_email):
+    print(to_email)
+    verification = client.verify \
+        .services(TWILIO_VERIFY_SERVICE) \
+        .verifications \
+        .create(to=to_email, channel='email')
+    print(verification)
 
 @app.route('/unauthorized_page', methods=['GET'])
 def unauthorized_page():
