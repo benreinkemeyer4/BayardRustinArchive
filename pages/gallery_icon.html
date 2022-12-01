@@ -30,30 +30,42 @@
 
     <!-- button leading to icon view -->
     <a href="/gallery" class="btn btn-primary">list view</a>
+    <a href="/gallery_icon" class="btn btn-primary">icon view</a>
     <!-- --------------------------- -->
-    <div method="get" style="width:85%; margin-top: 2%;" class="image-grid">
-        <a href="/index"><img src="/static/logo_square.png" width="300" height="300" alt=""></a>
-        <a href="/index"><img src="/static/logo_square.png" width="300" height="300" alt=""></a>
-        <a href="/index"><img src="/static/logo_square.png" width="300" height="300" alt=""></a>
-        <a href="/index"><img src="/static/logo_square.png" width="300" height="300" alt=""></a>
-        <a href="/index"><img src="/static/logo_square.png" width="300" height="300" alt=""></a>
+    <div method="get" style="width:85%; margin-top: 2%;" class="grid">
         {% for result_dict in results_dict_list: %}
               {% if result_dict.approved == True %}
                   {% if result_dict.mediatype == "Image"%}
-                  <a href="/details?mediaid={{result_dict.id}}">
-                    <img src="{{result_dict.mediaurl}}" width="300" height="300" alt="{{result_dict.title}}">
-                  </a>
+                  <div class="image">
+                    <a href="/details?mediaid={{result_dict.id}}">
+                        <img src="{{result_dict.mediaurl}}" width="200" height="200" alt="{{result_dict.title}}">
+                    </a>
+                    <div class="bottom-right">{{result_dict.title}}</div>
+                  </div>         
                   {% elif result_dict.mediatype == "Document" %}
-                  <a href="/details?mediaid={{result_dict.id}}">
-                    <img src="/static/pdf_icon.png" width="300" height="300" alt="{{result_dict.title}}">
-                  </a>
+                  <div class="container">
+                    <a href="/details?mediaid={{result_dict.id}}">
+                        <img src="/static/pdf_icon.png" width="200" height="200" alt="{{result_dict.title}}">
+                        <div class="bottom-right">{{result_dict.title}}</div>
+                      </a>
+                  </div>
                   {% elif result_dict.mediatype == "Video" %}
-                  <a href="/details?mediaid={{result_dict.id}}">
-                    <img src="/static/video_icon.png" width="300" height="300" alt="{{result_dict.title}}">
-                  </a>
+                  <div class="container">
+                    <a href="/details?mediaid={{result_dict.id}}">
+                        <img src="/static/video_icon.png" width="200" height="200" alt="{{result_dict.title}}">
+                        <div class="bottom-right">{{result_dict.title}}</div>
+                      </a>
+                  </div>
                   {% endif %}
               {% endif %}
             {% endfor %}
+        <a href="/index"><img src="/static/logo_square.png" width="200" height="200" alt=""></a>
+        <a href="/index"><img src="/static/logo_square.png" width="200" height="200" alt=""></a>
+        <a href="/index"><img src="/static/logo_square.png" width="200" height="200" alt=""></a>
+        <a href="/index"><img src="/static/logo_square.png" width="200" height="200" alt=""></a>
+        <a href="/index"><img src="/static/logo_square.png" width="200" height="200" alt=""></a>
+        <a href="/index"><img src="/static/logo_square.png" width="200" height="200" alt=""></a>
+        <a href="/index"><img src="/static/logo_square.png" width="200" height="200" alt=""></a>
     </div>
 
     
