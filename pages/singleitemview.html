@@ -35,7 +35,7 @@
 
 
     {% if result_dict["mediatype"] == "Image"%}
-    <img src="{{result_dict.mediaurl}}"/>
+    <img src="{{result_dict.mediaurl}}" width="300" height="300"/>
     {% elif result_dict["mediatype"] == "Document" %}
     <embed src="{{result_dict.mediaurl}}" width="800px" height="2100px" />
     {% elif result_dict["mediatype"] == "Video" %}
