@@ -31,32 +31,40 @@
     <!-- button leading to icon view -->
     <a href="/gallery" class="btn btn-primary">list view</a>
     <!-- --------------------------- -->
-    <div method="get" style="width:85%; margin-top: 2%;" class="image-grid">
-        <a href="/index"><img src="/static/logo_square.png" width="300" height="300" alt=""></a>
-        <a href="/index"><img src="/static/logo_square.png" width="300" height="300" alt=""></a>
-        <a href="/index"><img src="/static/logo_square.png" width="300" height="300" alt=""></a>
-        <a href="/index"><img src="/static/logo_square.png" width="300" height="300" alt=""></a>
-        <a href="/index"><img src="/static/logo_square.png" width="300" height="300" alt=""></a>
+    <div method="get" style="width:85%; margin-top: 2%;" class="container">
+      <div class="row">
+
         {% for result_dict in results_dict_list: %}
               {% if result_dict.approved == True %}
                   {% if result_dict.mediatype == "Image"%}
+                  <div class="col">
                   <a href="/details?mediaid={{result_dict.id}}">
                     <img src="{{result_dict.mediaurl}}" width="300" height="300" alt="{{result_dict.title}}">
+                    <p>{{result_dict.title}}</p>
                   </a>
+                </div>
                   {% elif result_dict.mediatype == "Document" %}
+                  <div class="col">
                   <a href="/details?mediaid={{result_dict.id}}">
-                    <img src="/static/pdf_icon.png" width="300" height="300" alt="{{result_dict.title}}">
+                    <embed src="{{result_dict.mediaurl}}" width="300" height="300" />
+                    <p>{{result_dict.title}}</p>
                   </a>
+                </div>
                   {% elif result_dict.mediatype == "Video" %}
+                  <div class="col">
                   <a href="/details?mediaid={{result_dict.id}}">
-                    <img src="/static/video_icon.png" width="300" height="300" alt="{{result_dict.title}}">
+                    <iframe width="300" height="300"  src="{{result_dict.mediaurl}}"></iframe>
+                    <p>{{result_dict.title}}</p>
                   </a>
+                </div>
                   {% endif %}
               {% endif %}
             {% endfor %}
+
+      </div>
     </div>
 
-    
+
     <!-- --------------------------- -->
     </div>
   </center>

@@ -431,15 +431,33 @@ def gallery_icon():
     print(results)
     results_dict_list = []
     for result in results:
-        result_dict = {
-            "title": result[5],
-            "contributor": result[1],
-            "uploaddate": result[3],
-            "mediatype": result[9],
-            "tags": result[10],
-            "approved": result[8],
-            "id": result[0]
-        }
+        mediatype = result[9]
+        mediaurl = result[7]
+
+        if mediatype == "Video":
+            youtube_id = video_id(mediaurl)
+            embed_url = "https://www.youtube.com/embed/"+youtube_id
+            result_dict = {
+                "title": result[5],
+                "contributor": result[1],
+                "uploaddate": result[3],
+                "mediatype": result[9],
+                "tags": result[10],
+                "approved": result[8],
+                "id": result[0],
+                "mediaurl":embed_url
+            }
+        else:
+            result_dict = {
+                "title": result[5],
+                "contributor": result[1],
+                "uploaddate": result[3],
+                "mediatype": result[9],
+                "tags": result[10],
+                "approved": result[8],
+                "id": result[0],
+                "mediaurl": mediaurl
+            }
         results_dict_list.append(result_dict)
     html_code = render_template('gallery_icon.html', \
         results_dict_list = results_dict_list
