@@ -75,7 +75,9 @@
     <div class="row" style="width:80%;">
       <div class="col">
       <div class="form-group">
-        <label for="tags">Tags (limit 5)</label>
+        <label for="tags">Tags 
+          <br><label style="color: grey">(hold command or ctrl to select multiple tags; limit 5)</label><br>
+        </label>
         <br>
         <select class="form-control" id="tags" name="tags" multiple>
           {% for tag in tags %}

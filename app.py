@@ -48,7 +48,7 @@ recaptcha = ReCaptcha(app) # Create a ReCaptcha object by passing in 'app' as pa
 media_url = ""
 media_type = ""
 
-tags = ["1963 March on Washington for Jobs and Freedom", "Paper", "Pamphlet", "Leaflet", "Video", "Audio", "Essay", "Book", "Photograph", "Research", "Personal", "Interaction", "Story", "Speech", "Activism", "Gandhi", "Civil Rights", "LGBTQIA+ rights", "Intersectionality", "Labor Rights", "Voting Rights", "Union", "AFL-CIO", "Black Power", "Organizer", "Martin Luther King", "A. Philip Randolph", "Pacifism", "Quaker", "Protest", "Boycott", "Sit-in", "News", "Queer", "Africa", "Zambia", "Malcolm X", "President Obama", "Southern Christian Leadership Conference", "Freedom Riders", "Medal of Freedom"]
+tags = ["1963 March on Washington for Jobs and Freedom", "Paper", "Pamphlet", "Leaflet", "Video", "Audio", "Essay", "Book", "Photograph", "Research", "Personal", "Interaction", "Story", "Speech", "Activism", "Gandhi", "Civil Rights", "LGBTQIA+ rights", "Intersectionality", "Labor Rights", "Voting Rights", "Union", "AFL-CIO", "Black Power", "Organizer", "Martin Luther King", "A. Philip Randolph", "Pacifism", "Quaker", "Protest", "Boycott", "Sit-in", "News", "Queer", "Africa", "Zambia", "Malcolm X", "President Obama", "Southern Christian Leadership Conference", "Freedom Riders", "Medal of Freedom", "Walter Naegle", "Bayard Rustin Center For Social Justice"]
 
 
 def video_id(value):
@@ -421,6 +421,30 @@ def admin_singleitemview():
 @app.route('/header', methods=['GET'])
 def header():
     html_code = render_template('header.html')
+    response = make_response(html_code)
+    return response
+
+# Add special icon gallery view
+@app.route('/gallery_icon', methods=['GET'])
+def gallery_icon():
+    results = query_db()
+    print(results)
+    results_dict_list = []
+    for result in results:
+        result_dict = {
+            "title": result[5],
+            "contributor": result[1],
+            "uploaddate": result[3],
+            "mediatype": result[9],
+            "tags": result[10],
+            "approved": result[8],
+            "id": result[0]
+        }
+        results_dict_list.append(result_dict)
+    html_code = render_template('gallery_icon.html', \
+        results_dict_list = results_dict_list
+
+        )
     response = make_response(html_code)
     return response
 
