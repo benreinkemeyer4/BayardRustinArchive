@@ -10,18 +10,14 @@ from database.delete_db import delete_db
 import auth
 import urllib.parse
 import os
-#from flask_mail import Mail, Message
-#try 2 of sending mail
-# from email.mime.multipart import MIMEMultipart
-# from email.mime.text import MIMEText
-# import smtplib
-# import ssl
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
+from flask_mail import Mail, Message
+
+from flask_recaptcha import ReCaptcha # Import ReCaptcha object
+
 
 import cloudinary_methods
 
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'jpg', 'jpeg'}
+ALLOWED_EXTENSIONS = {'pdf', 'jpg', 'jpeg'}
 UPLOAD_FOLDER = './uploads'
 
 
@@ -29,13 +25,29 @@ UPLOAD_FOLDER = './uploads'
 app = Flask(__name__, template_folder='./pages')
 app.secret_key = "secret key"
 
-MAX_MB = 10
-#It will allow below 10MB contents only, you can change it
-app.config['MAX_CONTENT_LENGTH'] = MAX_MB * 1024 * 1024
+mail = Mail(app)
+#mail config
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+mail = Mail(app)
+
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+app.config['RECAPTCHA_ENABLE'] = True
+app.config['RECAPTCHA_SITE_KEY'] = '6LfwBSkjAAAAAEyt-PsS-GxKSfyVWT4jo882WD6R' # <-- Add your site key
+app.config['RECAPTCHA_SECRET_KEY'] = '6LfwBSkjAAAAAFJf6CN8M2G-_NZm8AaN1pSjYdwm' # <-- Add your secret key
+recaptcha = ReCaptcha(app) # Create a ReCaptcha object by passing in 'app' as parameter
+
+
+
 media_url = ""
+media_type = ""
+
 tags = ["1963 March on Washington for Jobs and Freedom", "Paper", "Pamphlet", "Leaflet", "Video", "Audio", "Essay", "Book", "Photograph", "Research", "Personal", "Interaction", "Story", "Speech", "Activism", "Gandhi", "Civil Rights", "LGBTQIA+ rights", "Intersectionality", "Labor Rights", "Voting Rights", "Union", "AFL-CIO", "Black Power", "Organizer", "Martin Luther King", "A. Philip Randolph", "Pacifism", "Quaker", "Protest", "Boycott", "Sit-in", "News", "Queer", "Africa", "Zambia", "Malcolm X", "President Obama", "Southern Christian Leadership Conference", "Freedom Riders", "Medal of Freedom"]
 
 
@@ -88,21 +100,6 @@ def logoutgoogle():
 @app.route('/', methods=['GET','POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-    #try 3: sendgrid doesnt work rn because certificate verify failed: unable to get local issuer certificate (_ssl.c:997)>
-    # message = Mail(
-    #     from_email='bayardrustinarchive@gmail.com',
-    #     to_emails='kathyli4735@gmail.com',
-    #     subject='Sending with Twilio SendGrid is easy',
-    #     html_content='<strong>Even with Python</strong>')
-
-    # #sg = SendGridAPIClient(os.environ.get('SENDGRID_API_KEY'))
-    # sg = SendGridAPIClient("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")
-    # response = sg.send(message)
-    # print(response.status_code, response.body, response.headers) 
-    #------try 3 end
-
-
-
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
@@ -119,18 +116,37 @@ def index():
             return redirect(request.url)
 
         if file and allowed_file(file.filename):
-            #upload to cloudinary
-            url = cloudinary_methods.upload(file)
 
-            global media_url
-            media_url = url
+            extension = file.filename.rsplit('.', 1)[1].lower()
+            print(extension)
+            if extension == "pdf":
+                type = "Document"
+            else:
+                type = "Image"
+
+            file.seek(0, os.SEEK_END)
+            file_length = file.tell()
+            print(file_length)
+
+            if file_length > 10000000:
+                flash('Maximum file size is 10 MB (megabytes)')
+                return redirect(request.url)
+            else:
+                file.seek(0)
+                #upload to cloudinary
+                url = cloudinary_methods.upload(file)
+
+                global media_url
+                global media_type
+                media_url = url
+                media_type = type
 
 
-            print('File successfully uploaded')
-            return redirect(url_for('upload_media_details'))
+                print('File successfully uploaded')
+                return redirect(url_for('upload_media_details'))
         else:
-            print('Allowed file types are txt, pdf, jpg, jpeg')
-            flash('Allowed file types are txt, pdf, jpg, jpeg')
+            print('Allowed file types are pdf, jpg, jpeg')
+            flash('Allowed file types are pdf, jpg, jpeg')
             return redirect(request.url)
 
 
@@ -144,35 +160,42 @@ def index():
 @app.route('/upload_media_details', methods=['GET', 'POST'])
 def upload_media_details():
     global tags
+    message=""
     if request.method == 'POST':
-        user_tags = []
+        if recaptcha.verify(): # Use verify() method to see if ReCaptcha is filled out
+            user_tags = []
+            for index in request.form.getlist('tags'):
+                user_tags.append(tags[int(index)])
+            submission = {
+                "submitter-name": request.form.get('submitter-name'),
+                "date_taken": request.form.get('date'),
+                "submitter-email": request.form.get('submitter-email'),
+                "submitter-pronouns": request.form.get('submitter-pronouns'),
+                "tags": user_tags,
+                "title": request.form.get('title'),
+                "description": request.form.get('description'),
+                "media_url": media_url,
+                "media_type": media_type
+            }
 
-        for index in request.form.getlist('tags'):
-            user_tags.append(tags[int(index)])
-        submission = {
-            "submitter-name": request.form.get('submitter-name'),
-            "date_taken": request.form.get('date'),
-            "submitter-email": request.form.get('submitter-email'),
-            "tags": user_tags,
-            "title": request.form.get('title'),
-            "description": request.form.get('description'),
-            "media_url": media_url,
-            "media_type": request.form.get('media_type')
-        }
-
-        print(submission)
-        insert_db(submission)
-        return redirect('/thank_you')
+            print(submission)
+            insert_db(submission)
+            msg = Message(
+                '[Bayard Rustin Archive] New Upload',
+                sender ='bayardrustinarchive@gmail.com',
+                recipients = ['bayardrustinarchive@gmail.com'] #change to their actual emails eventually
+               )
+            msg.body = 'There is a new upload to the Bayard Rustin Archive! View it here: https://bayard-rustin-archive-web.onrender.com/'
+            mail.send(msg)
+            return redirect('/thank_you')
+        else:
+            message = 'Please fill out the ReCaptcha!' # Send error message
 
 
-
-
-
-
-
-    html_code = render_template('upload_media_details.html', tags = tags)
+    html_code = render_template('upload_media_details.html', tags = tags, message=message)
     response = make_response(html_code)
     return response
+
 
 
 @app.route('/video_instructions', methods=['GET', "POST"])
@@ -188,41 +211,42 @@ def video_instructions():
 @app.route('/upload_video_details', methods=['GET', 'POST'])
 def upload_video_details():
     global tags
+    message=""
     if request.method == 'POST':
-        user_tags = []
+        if recaptcha.verify(): # Use verify() method to see if ReCaptcha is filled out
+            user_tags = []
+            for index in request.form.getlist('tags'):
+                user_tags.append(tags[int(index)])
+            submission = {
+                "submitter-name": request.form.get('submitter-name'),
+                "date_taken": request.form.get('date'),
+                "submitter-email": request.form.get('submitter-email'),
+                "tags": user_tags,
+                "title": request.form.get('title'),
+                "description": request.form.get('description'),
+                "media_url": request.form.get('media-url'),
+                "media_type": "Video",
+                "submitter-pronouns": request.form.get('submitter-pronouns'),
 
-        for index in request.form.getlist('tags'):
-            user_tags.append(tags[int(index)])
-        submission = {
-            "submitter-name": request.form.get('submitter-name'),
-            "date_taken": request.form.get('date'),
-            "submitter-email": request.form.get('submitter-email'),
-            "tags": user_tags,
-            "title": request.form.get('title'),
-            "description": request.form.get('description'),
-            "media_url": request.form.get('media-url'),
-            "media_type": "Video"
-        }
+            }
 
-        print(submission)
-        insert_db(submission)
-        return redirect('/thank_you')
+            print(submission)
+            insert_db(submission)
+            msg = Message(
+            '[Bayard Rustin Archive] New Upload',
+            sender ='bayardrustinarchive@gmail.com',
+            recipients = ['bayardrustinarchive@gmail.com'] #change to their actual emails eventually
+            )
+            msg.body = 'There is a new upload to the Bayard Rustin Archive! View it here: https://bayard-rustin-archive-web.onrender.com/'
+            mail.send(msg)
+            return redirect('/thank_you')
+        else:
+            message = 'Please fill out the ReCaptcha!' # Send error message
 
 
-    html_code = render_template('upload_video_details.html', tags = tags)
+    html_code = render_template('upload_video_details.html', tags = tags, message=message)
     response = make_response(html_code)
     return response
-
-
-
-
-
-
-
-    html_code = render_template('upload_media_details.html', tags = tags)
-    response = make_response(html_code)
-    return response
-
 
 
 @app.route('/unauthorized_page', methods=['GET'])
@@ -369,7 +393,8 @@ def admin_singleitemview():
             "mediaurl": embed_url,
             "mediatype": mediatype,
             "tags": result[10],
-            "mediaid":result[0]
+            "mediaid":result[0],
+            "submitter-pronouns":result[11]
         }
             html_code = render_template('admin_singleitemview.html', result_dict=result_dict)
             response = make_response(html_code)
@@ -386,7 +411,8 @@ def admin_singleitemview():
             "mediaurl": mediaurl,
             "mediatype": mediatype,
             "tags": result[10],
-            "mediaid":result[0]
+            "mediaid":result[0],
+            "submitter-pronouns":result[11]
         }
         html_code = render_template('admin_singleitemview.html', result_dict=result_dict)
         response = make_response(html_code)
