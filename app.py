@@ -14,8 +14,7 @@ from flask_mail import Mail, Message
 from flask_recaptcha import ReCaptcha # Import ReCaptcha object
 from twilio.rest import Client
 from dotenv import load_dotenv
-
-
+from twilio.base.exceptions import TwilioRestException
 import cloudinary_methods
 
 ALLOWED_EXTENSIONS = {'pdf', 'jpg', 'jpeg'}
@@ -44,7 +43,6 @@ TWILIO_AUTH_TOKEN= os.environ.get('TWILIO_AUTH_TOKEN')
 TWILIO_VERIFY_SERVICE = os.environ.get('TWILIO_VERIFY_SERVICE')
 SENDGRID_API_KEY= os.environ.get('SENDGRID_API_KEY')
 
-print(TWILIO_ACCOUNT_SID)
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -93,6 +91,7 @@ def allowed_file(filename):
 # Routes for authentication. -------------------
 @app.route('/login', methods=['GET'])
 def login():
+    session['logged_in'] = True
     return auth.login()
 
 @app.route('/login/callback', methods=['GET'])
@@ -105,6 +104,7 @@ def logoutapp():
 
 @app.route('/logoutgoogle', methods=['GET'])
 def logoutgoogle():
+    session['logged_in'] = False
     return auth.logoutgoogle()
 
 # ---------------------------------------------------
@@ -280,30 +280,42 @@ def generate_verification_code():
     error = None
     if request.method == 'POST':
         verification_code = request.form['verificationcode']
-        if check_verification_token(to_email, verification_code):
-            submission = session['submission']
-            print(submission)
-            insert_db(submission)
-            msg = Message(
-            '[Bayard Rustin Archive] New Upload',
-            sender ='bayardrustinarchive@gmail.com',
-            recipients = ['bayardrustinarchive@gmail.com'] #change to their actual emails eventually
-            )
-            msg.body = 'There is a new upload to the Bayard Rustin Archive! View it here: https://bayard-rustin-archive-web.onrender.com/'
-            mail.send(msg)
 
-            return redirect('/thank_you')
+        status = check_verification_token(to_email, verification_code)
+        print(status)
+        if not status["error"]:
+            if status["approved"]:
+                submission = session['submission']
+                print(submission)
+                insert_db(submission)
+                msg = Message(
+                '[Bayard Rustin Archive] New Upload',
+                sender ='bayardrustinarchive@gmail.com',
+                recipients = ['bayardrustinarchive@gmail.com'] #change to their actual emails eventually
+                )
+                msg.body = 'There is a new upload to the Bayard Rustin Archive! View it here: https://bayard-rustin-archive-web.onrender.com/'
+                mail.send(msg)
+
+                return redirect('/thank_you')
+            else:
+                error = "Invalid verification code. Please try again."
+                return render_template('verifypage.html', error = error)
+
         else:
-            error = "Invalid verification code. Please try again."
-            return render_template('verifypage.html', error = error)
+            return redirect(url_for('unauthorized_page'))
+
     return render_template('verifypage.html', email = to_email)
 
 def check_verification_token(phone, token):
-    check = client.verify \
-        .services(TWILIO_VERIFY_SERVICE) \
-        .verification_checks \
-        .create(to=phone, code=token)
-    return check.status == 'approved'
+    try:
+        check = client.verify \
+            .services(TWILIO_VERIFY_SERVICE) \
+            .verification_checks \
+            .create(to=phone, code=token)
+        return {"approved":check.status == 'approved', "error":False}
+    except TwilioRestException as e:
+        return {"approved":False, "error":True}
+
 
 @app.route('/thank_you', methods=['GET'])
 def thank_you():
@@ -470,7 +482,7 @@ def admin_singleitemview():
 
 @app.route('/header', methods=['GET'])
 def header():
-    html_code = render_template('header.html')
+    html_code = render_template('header.html', logged_in = session["logged_in"])
     response = make_response(html_code)
     return response
 

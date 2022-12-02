@@ -25,9 +25,13 @@
       </li>
       <li class="nav-item">
         <a class="nav-link" href="./login">Admin Login</a>
+
       </li>
       <li>
+
+        {% if logged_in %}
         <a class="nav-link" aria-current="page" href="/logoutgoogle" style="color: blue">Logout</a>
+        {% endif %}
       </li>
     </ul>
   </div>
