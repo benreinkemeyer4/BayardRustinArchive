@@ -43,6 +43,8 @@ TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
 TWILIO_AUTH_TOKEN= os.environ.get('TWILIO_AUTH_TOKEN')
 TWILIO_VERIFY_SERVICE = os.environ.get('TWILIO_VERIFY_SERVICE')
 SENDGRID_API_KEY= os.environ.get('SENDGRID_API_KEY')
+
+print(TWILIO_ACCOUNT_SID)
 client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -173,6 +175,12 @@ def upload_media_details():
     if request.method == 'POST':
         if recaptcha.verify(): # Use verify() method to see if ReCaptcha is filled out
             user_tags = []
+            to_email = request.form.get('submitter-email')
+            print(to_email)
+            session['to_email'] = to_email
+
+            send_verification(to_email)
+
             for index in request.form.getlist('tags'):
                 user_tags.append(tags[int(index)])
             submission = {
@@ -186,17 +194,8 @@ def upload_media_details():
                 "media_url": media_url,
                 "media_type": media_type
             }
-
-            print(submission)
-            insert_db(submission)
-            msg = Message(
-                '[Bayard Rustin Archive] New Upload',
-                sender ='bayardrustinarchive@gmail.com',
-                recipients = ['bayardrustinarchive@gmail.com'] #change to their actual emails eventually
-               )
-            msg.body = 'There is a new upload to the Bayard Rustin Archive! View it here: https://bayard-rustin-archive-web.onrender.com/'
-            mail.send(msg)
-            return redirect('/thank_you')
+            session['submission'] = submission
+            return redirect(url_for('generate_verification_code'))
         else:
             message = 'Please fill out the ReCaptcha!' # Send error message
 
@@ -205,7 +204,13 @@ def upload_media_details():
     response = make_response(html_code)
     return response
 
-
+def send_verification(to_email):
+    print(to_email)
+    verification = client.verify \
+        .services(TWILIO_VERIFY_SERVICE) \
+        .verifications \
+        .create(to=to_email, channel='email')
+    print(verification.status)
 
 @app.route('/video_instructions', methods=['GET', "POST"])
 def video_instructions():
@@ -245,16 +250,8 @@ def upload_video_details():
 
             }
 
-            print(submission)
-            insert_db(submission)
-            msg = Message(
-            '[Bayard Rustin Archive] New Upload',
-            sender ='bayardrustinarchive@gmail.com',
-            recipients = ['bayardrustinarchive@gmail.com'] #change to their actual emails eventually
-            )
-            msg.body = 'There is a new upload to the Bayard Rustin Archive! View it here: https://bayard-rustin-archive-web.onrender.com/'
-            mail.send(msg)
-            return redirect('/thank_you')
+            session['submission'] = submission
+            return redirect(url_for('generate_verification_code'))
         else:
             message = 'Please fill out the ReCaptcha!' # Send error message
 
@@ -269,13 +266,44 @@ def send_verification(to_email):
         .services(TWILIO_VERIFY_SERVICE) \
         .verifications \
         .create(to=to_email, channel='email')
-    print(verification)
+    print(verification.status)
 
 @app.route('/unauthorized_page', methods=['GET'])
 def unauthorized_page():
     html_code = render_template('unauthorized_page.html')
     response = make_response(html_code)
     return response
+
+@app.route('/verifyme', methods=['GET', 'POST'])
+def generate_verification_code():
+    to_email = session['to_email']
+    error = None
+    if request.method == 'POST':
+        verification_code = request.form['verificationcode']
+        if check_verification_token(to_email, verification_code):
+            submission = session['submission']
+            print(submission)
+            insert_db(submission)
+            msg = Message(
+            '[Bayard Rustin Archive] New Upload',
+            sender ='bayardrustinarchive@gmail.com',
+            recipients = ['bayardrustinarchive@gmail.com'] #change to their actual emails eventually
+            )
+            msg.body = 'There is a new upload to the Bayard Rustin Archive! View it here: https://bayard-rustin-archive-web.onrender.com/'
+            mail.send(msg)
+
+            return redirect('/thank_you')
+        else:
+            error = "Invalid verification code. Please try again."
+            return render_template('verifypage.html', error = error)
+    return render_template('verifypage.html', email = to_email)
+
+def check_verification_token(phone, token):
+    check = client.verify \
+        .services(TWILIO_VERIFY_SERVICE) \
+        .verification_checks \
+        .create(to=phone, code=token)
+    return check.status == 'approved'
 
 @app.route('/thank_you', methods=['GET'])
 def thank_you():
