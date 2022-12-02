@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from flask import Flask, render_template, request, make_response, redirect, flash, url_for
+from flask import Flask, render_template, request, make_response, redirect, flash, url_for, session
 from werkzeug.utils import secure_filename
 from werkzeug.exceptions import RequestEntityTooLarge
 from database.query_db import query_db
@@ -11,16 +11,16 @@ import auth
 import urllib.parse
 import os
 from flask_mail import Mail, Message
-
 from flask_recaptcha import ReCaptcha # Import ReCaptcha object
-
-
+from twilio.rest import Client
+from dotenv import load_dotenv
+from twilio.base.exceptions import TwilioRestException
 import cloudinary_methods
 
 ALLOWED_EXTENSIONS = {'pdf', 'jpg', 'jpeg'}
 UPLOAD_FOLDER = './uploads'
 
-
+load_dotenv()
 # current directory
 app = Flask(__name__, template_folder='./pages')
 app.secret_key = "secret key"
@@ -36,6 +36,15 @@ app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
 
 
+# twilio config
+
+TWILIO_ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID')
+TWILIO_AUTH_TOKEN= os.environ.get('TWILIO_AUTH_TOKEN')
+TWILIO_VERIFY_SERVICE = os.environ.get('TWILIO_VERIFY_SERVICE')
+SENDGRID_API_KEY= os.environ.get('SENDGRID_API_KEY')
+
+client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 app.config['RECAPTCHA_ENABLE'] = True
@@ -48,7 +57,7 @@ recaptcha = ReCaptcha(app) # Create a ReCaptcha object by passing in 'app' as pa
 media_url = ""
 media_type = ""
 
-tags = ["1963 March on Washington for Jobs and Freedom", "Paper", "Pamphlet", "Leaflet", "Video", "Audio", "Essay", "Book", "Photograph", "Research", "Personal", "Interaction", "Story", "Speech", "Activism", "Gandhi", "Civil Rights", "LGBTQIA+ rights", "Intersectionality", "Labor Rights", "Voting Rights", "Union", "AFL-CIO", "Black Power", "Organizer", "Martin Luther King", "A. Philip Randolph", "Pacifism", "Quaker", "Protest", "Boycott", "Sit-in", "News", "Queer", "Africa", "Zambia", "Malcolm X", "President Obama", "Southern Christian Leadership Conference", "Freedom Riders", "Medal of Freedom"]
+tags = ["1963 March on Washington for Jobs and Freedom", "Paper", "Pamphlet", "Leaflet", "Video", "Audio", "Essay", "Book", "Photograph", "Research", "Personal", "Interaction", "Story", "Speech", "Activism", "Gandhi", "Civil Rights", "LGBTQIA+ rights", "Intersectionality", "Labor Rights", "Voting Rights", "Union", "AFL-CIO", "Black Power", "Organizer", "Martin Luther King", "A. Philip Randolph", "Pacifism", "Quaker", "Protest", "Boycott", "Sit-in", "News", "Queer", "Africa", "Zambia", "Malcolm X", "President Obama", "Southern Christian Leadership Conference", "Freedom Riders", "Medal of Freedom", "Walter Naegle", "Bayard Rustin Center For Social Justice"]
 
 
 def video_id(value):
@@ -82,6 +91,7 @@ def allowed_file(filename):
 # Routes for authentication. -------------------
 @app.route('/login', methods=['GET'])
 def login():
+    session['logged_in'] = True
     return auth.login()
 
 @app.route('/login/callback', methods=['GET'])
@@ -94,6 +104,7 @@ def logoutapp():
 
 @app.route('/logoutgoogle', methods=['GET'])
 def logoutgoogle():
+    session['logged_in'] = False
     return auth.logoutgoogle()
 
 # ---------------------------------------------------
@@ -164,6 +175,12 @@ def upload_media_details():
     if request.method == 'POST':
         if recaptcha.verify(): # Use verify() method to see if ReCaptcha is filled out
             user_tags = []
+            to_email = request.form.get('submitter-email')
+            print(to_email)
+            session['to_email'] = to_email
+
+            send_verification(to_email)
+
             for index in request.form.getlist('tags'):
                 user_tags.append(tags[int(index)])
             submission = {
@@ -177,17 +194,8 @@ def upload_media_details():
                 "media_url": media_url,
                 "media_type": media_type
             }
-
-            print(submission)
-            insert_db(submission)
-            msg = Message(
-                '[Bayard Rustin Archive] New Upload',
-                sender ='bayardrustinarchive@gmail.com',
-                recipients = ['bayardrustinarchive@gmail.com'] #change to their actual emails eventually
-               )
-            msg.body = 'There is a new upload to the Bayard Rustin Archive! View it here: https://bayard-rustin-archive-web.onrender.com/'
-            mail.send(msg)
-            return redirect('/thank_you')
+            session['submission'] = submission
+            return redirect(url_for('generate_verification_code'))
         else:
             message = 'Please fill out the ReCaptcha!' # Send error message
 
@@ -196,7 +204,13 @@ def upload_media_details():
     response = make_response(html_code)
     return response
 
-
+def send_verification(to_email):
+    print(to_email)
+    verification = client.verify \
+        .services(TWILIO_VERIFY_SERVICE) \
+        .verifications \
+        .create(to=to_email, channel='email')
+    print(verification.status)
 
 @app.route('/video_instructions', methods=['GET', "POST"])
 def video_instructions():
@@ -215,6 +229,12 @@ def upload_video_details():
     if request.method == 'POST':
         if recaptcha.verify(): # Use verify() method to see if ReCaptcha is filled out
             user_tags = []
+
+            to_email = request.form.get('submitter-email')
+            print(to_email)
+            session['to_email'] = to_email
+
+            send_verification(to_email)
             for index in request.form.getlist('tags'):
                 user_tags.append(tags[int(index)])
             submission = {
@@ -230,16 +250,8 @@ def upload_video_details():
 
             }
 
-            print(submission)
-            insert_db(submission)
-            msg = Message(
-            '[Bayard Rustin Archive] New Upload',
-            sender ='bayardrustinarchive@gmail.com',
-            recipients = ['bayardrustinarchive@gmail.com'] #change to their actual emails eventually
-            )
-            msg.body = 'There is a new upload to the Bayard Rustin Archive! View it here: https://bayard-rustin-archive-web.onrender.com/'
-            mail.send(msg)
-            return redirect('/thank_you')
+            session['submission'] = submission
+            return redirect(url_for('generate_verification_code'))
         else:
             message = 'Please fill out the ReCaptcha!' # Send error message
 
@@ -248,12 +260,62 @@ def upload_video_details():
     response = make_response(html_code)
     return response
 
+def send_verification(to_email):
+    print(to_email)
+    verification = client.verify \
+        .services(TWILIO_VERIFY_SERVICE) \
+        .verifications \
+        .create(to=to_email, channel='email')
+    print(verification.status)
 
 @app.route('/unauthorized_page', methods=['GET'])
 def unauthorized_page():
     html_code = render_template('unauthorized_page.html')
     response = make_response(html_code)
     return response
+
+@app.route('/verifyme', methods=['GET', 'POST'])
+def generate_verification_code():
+    to_email = session['to_email']
+    error = None
+    if request.method == 'POST':
+        verification_code = request.form['verificationcode']
+
+        status = check_verification_token(to_email, verification_code)
+        print(status)
+        if not status["error"]:
+            if status["approved"]:
+                submission = session['submission']
+                print(submission)
+                insert_db(submission)
+                msg = Message(
+                '[Bayard Rustin Archive] New Upload',
+                sender ='bayardrustinarchive@gmail.com',
+                recipients = ['bayardrustinarchive@gmail.com'] #change to their actual emails eventually
+                )
+                msg.body = 'There is a new upload to the Bayard Rustin Archive! View it here: https://bayard-rustin-archive-web.onrender.com/'
+                mail.send(msg)
+
+                return redirect('/thank_you')
+            else:
+                error = "Invalid verification code. Please try again."
+                return render_template('verifypage.html', error = error)
+
+        else:
+            return redirect(url_for('unauthorized_page'))
+
+    return render_template('verifypage.html', email = to_email)
+
+def check_verification_token(phone, token):
+    try:
+        check = client.verify \
+            .services(TWILIO_VERIFY_SERVICE) \
+            .verification_checks \
+            .create(to=phone, code=token)
+        return {"approved":check.status == 'approved', "error":False}
+    except TwilioRestException as e:
+        return {"approved":False, "error":True}
+
 
 @app.route('/thank_you', methods=['GET'])
 def thank_you():
@@ -430,7 +492,49 @@ def admin_singleitemview():
 
 @app.route('/header', methods=['GET'])
 def header():
-    html_code = render_template('header.html')
+    html_code = render_template('header.html', logged_in = session["logged_in"])
+    response = make_response(html_code)
+    return response
+
+# Add special icon gallery view
+@app.route('/gallery_icon', methods=['GET'])
+def gallery_icon():
+    results = query_db()
+    print(results)
+    results_dict_list = []
+    for result in results:
+        mediatype = result[9]
+        mediaurl = result[7]
+
+        if mediatype == "Video":
+            youtube_id = video_id(mediaurl)
+            embed_url = "https://www.youtube.com/embed/"+youtube_id
+            result_dict = {
+                "title": result[5],
+                "contributor": result[1],
+                "uploaddate": result[3],
+                "mediatype": result[9],
+                "tags": result[10],
+                "approved": result[8],
+                "id": result[0],
+                "mediaurl":embed_url
+            }
+        else:
+            result_dict = {
+                "title": result[5],
+                "contributor": result[1],
+                "uploaddate": result[3],
+                "mediatype": result[9],
+                "tags": result[10],
+                "approved": result[8],
+                "id": result[0],
+                "mediaurl": mediaurl
+            }
+        results_dict_list.append(result_dict)
+    html_code = render_template('gallery_icon.html', \
+        results_dict_list = results_dict_list
+
+        )
     response = make_response(html_code)
     return response
 

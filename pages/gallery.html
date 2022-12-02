@@ -23,12 +23,15 @@
       {% include 'header.html' %}
     </div>
 
-
     <center>
     <div class = "container-fluid" style="margin-top:10%">
       <h1>Gallery</h1>
+  
+    <!-- button leading to icon view -->
+    <a href="/gallery_icon" class="btn btn-primary">icon view</a>
+    <!-- --------------------------- -->
 
-    <div action="/gallery" method="get" style="width:90%; margin-top: 2%;" class="table-hover">
+    <div action="/gallery" method="get" style="width:85%; margin-top: 2%;" class="table-hover">
         <table class="table table-striped" id="gallery">
             <thead class="bg-primary">
               <tr>
