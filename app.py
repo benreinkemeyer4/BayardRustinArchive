@@ -379,7 +379,10 @@ def singleitemview():
     mediaid = request.args.get('mediaid')
     print(mediaid)
     results = query_singleitem_db(str(mediaid))
-
+    if results is None or len(results) ==0: 
+            html_code = render_template('no_such_item.html')
+            response = make_response(html_code)
+            return response
     result = results[0]
 
     mediatype = result[9]
@@ -437,7 +440,14 @@ def admin_singleitemview():
         mediaid = request.args.get('mediaid')
         results = query_singleitem_db(str(mediaid))
 
+        if results is None or len(results) ==0: 
+            html_code = render_template('no_such_item.html')
+            response = make_response(html_code)
+            return response
+
         result = results[0]
+
+    
         print(result)
 
         mediatype = result[9]

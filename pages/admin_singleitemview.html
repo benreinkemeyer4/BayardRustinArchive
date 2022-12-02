@@ -57,7 +57,8 @@
 
 
     {% if result_dict["mediatype"] == "Image"%}
-    <img src="{{result_dict.mediaurl}}"/>
+    <a href="{{result_dict.mediaurl}}" download = "{{result_dict.mediaurl}}"><img src="{{result_dict.mediaurl}}" width="800px"/></a>
+    
     {% elif result_dict["mediatype"] == "Document" %}
     <embed src="{{result_dict.mediaurl}}" width="800px" height="2100px" />
     {% elif result_dict["mediatype"] == "Video" %}
@@ -69,9 +70,6 @@
     </div>
 
 
-    <!----
-    <a href = "https://www.boredbutton.com/">Link</a>
-    -->
 
 
 
