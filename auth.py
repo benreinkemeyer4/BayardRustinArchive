@@ -124,8 +124,9 @@ def callback():
     # if not userinfo_response.json().get('email_verified'):
     #     message = 'User email not available or not verified by Google.'
     #     return message, 400
-    validemails = {"kxli@princeton.edu", "johnsonan299@gmail.com", "sw42@princeton.edu", "al52@princeton.edu", "brr2@princeton.edu", "sc73@princeton.edu", "brcsjqueerlib@gmail.com", "rustincenter@gmail.com",
-    "seansmoove27@gmail.com", "bayardrustinarchive@gmail.com"}
+    validemails = {"kxli@princeton.edu", "johnsonan299@gmail.com", "sw42@princeton.edu", "al52@princeton.edu", 
+    "brr2@princeton.edu", "sc73@princeton.edu", "brcsjqueerlib@gmail.com", "rustincenter@gmail.com",
+    "seansmoove27@gmail.com", "bayardrustinarchive@gmail.com", "aj3189@princeton.edu","andrac@princeton.edu","rdondero@princeton.edu"}
     if not userinfo_response.json()['email'] in validemails:
         return flask.redirect(flask.url_for('unauthorized_page'))
 
