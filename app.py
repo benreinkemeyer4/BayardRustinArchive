@@ -7,6 +7,7 @@ from database.insert_db import insert_db
 from database.query_singleitem_db import query_singleitem_db
 from database.approve_sub import approve_sub
 from database.delete_db import delete_db
+from database.edit_db import edit_db
 import auth
 import urllib.parse
 import os
@@ -468,7 +469,7 @@ def admin_singleitemview():
             "mediaid":result[0],
             "submitter-pronouns":result[11]
         }
-            html_code = render_template('admin_singleitemview.html', result_dict=result_dict)
+            html_code = render_template('admin_singleitemview.html', result_dict=result_dict, mediaid=mediaid)
             response = make_response(html_code)
             return response
 
@@ -489,6 +490,81 @@ def admin_singleitemview():
         html_code = render_template('admin_singleitemview.html', result_dict=result_dict)
         response = make_response(html_code)
         return response
+
+@app.route('/admin_edit', methods=['GET', 'POST']) #why is it both? which cases would they be?
+def admin_edit():
+    username = auth.authenticate()
+    global tags
+    user_tags = []
+    ##displaying previously values
+    mediaid = request.args.get('mediaid')
+    results = query_singleitem_db(str(mediaid))
+    if results is None or len(results) ==0: 
+        html_code = render_template('no_such_item.html')
+        response = make_response(html_code)
+        return response
+    if request.method == 'POST':
+        ##when they submit edits
+        for index in request.form.getlist('tags'):
+            user_tags.append(tags[int(index)])
+        submission = {
+            "submitter-name": request.form.get('submitter-name'),
+            "date_taken": request.form.get('date'),
+            "submitter-email": request.form.get('submitter-email'),
+            "submitter-pronouns": request.form.get('submitter-pronouns'),
+            "tags": user_tags,
+            "title": request.form.get('title'),
+            "description": request.form.get('description'),
+            "mediaid": mediaid
+        }
+        edit_db(submission)
+        url = 'admin_details?mediaid=' + str(mediaid)
+        return redirect(url) #change this to going back to original media id
+
+
+    result = results[0]
+
+    mediatype = result[9]
+    mediaurl = result[7]
+    result_dict=""
+    if mediatype == "Video":
+        youtube_id = video_id(mediaurl)
+        embed_url = "https://www.youtube.com/embed/"+youtube_id
+
+        ## IF WE DON'T DISPLAY THE VIDEO THEN WE DO NOT NEED A SEPARATE IF STATEMENT
+
+        result_dict = {
+        "title": result[5],
+        "desc": result[6],
+        "submitter-name": result[1],
+        "submitter-email": result[4],
+        "tags": result[10],
+        "submitter-pronouns":result[11],
+        "date_taken":result[2],
+        "mediaurl": embed_url,
+        "mediatype": mediatype,
+    }
+    else:
+        result_dict = {
+        "title": result[5],
+        "desc": result[6],
+        "submitter-name": result[1],
+        "submitter-email": result[4],
+        "tags": result[10],
+        "submitter-pronouns":result[11],
+        "date_taken":result[2],
+        "mediaurl": mediaurl,
+        "mediatype": mediatype
+    }
+
+    if result[10] == "":
+        result_dict["tags"] = None
+    
+    
+    html_code = render_template('admin_edit.html', tags = tags, result_dict = result_dict, mediaid=mediaid)
+    response = make_response(html_code)
+    return response
+
 
 @app.route('/header', methods=['GET'])
 def header():
