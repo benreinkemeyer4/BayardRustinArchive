@@ -489,7 +489,7 @@ def admin_singleitemview():
             "mediaid":result[0],
             "submitter-pronouns":result[11]
         }
-        html_code = render_template('admin_singleitemview.html', result_dict=result_dict)
+        html_code = render_template('admin_singleitemview.html', result_dict=result_dict, mediaid=mediaid)
         response = make_response(html_code)
         return response
 
