@@ -572,6 +572,18 @@ def header():
     response = make_response(html_code)
     return response
 
+@app.route('/footer', methods=['GET'])
+def footer():
+    html_code = render_template('footer.html')
+    response = make_response(html_code)
+    return response
+
+@app.route('/about_us', methods=['GET'])
+def about_us():
+    html_code = render_template('about_us.html')
+    response = make_response(html_code)
+    return response
+
 # Add special icon gallery view
 @app.route('/gallery_icon', methods=['GET'])
 def gallery_icon():
