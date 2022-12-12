@@ -26,6 +26,11 @@ load_dotenv()
 app = Flask(__name__, template_folder='./pages')
 app.secret_key = "secret key"
 
+
+# 10 Mb limit
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
+
+
 mail = Mail(app)
 #mail config
 app.config['MAIL_SERVER']='smtp.gmail.com'
@@ -136,26 +141,18 @@ def index():
             else:
                 type = "Image"
 
-            file.seek(0, os.SEEK_END)
-            file_length = file.tell()
-            print(file_length)
 
-            if file_length > 10000000:
-                flash('Maximum file size is 10 MB (megabytes)')
-                return redirect(request.url)
-            else:
-                file.seek(0)
-                #upload to cloudinary
-                url = cloudinary_methods.upload(file)
+            #upload to cloudinary
+            url = cloudinary_methods.upload(file)
 
-                global media_url
-                global media_type
-                media_url = url
-                media_type = type
+            global media_url
+            global media_type
+            media_url = url
+            media_type = type
 
 
-                print('File successfully uploaded')
-                return redirect(url_for('upload_media_details'))
+            print('File successfully uploaded')
+            return redirect(url_for('upload_media_details'))
         else:
             print('Allowed file types are pdf, jpg, jpeg')
             flash('Allowed file types are pdf, jpg, jpeg')
@@ -168,6 +165,11 @@ def index():
 
 #     #request.form['customFileInput']
 
+
+
+@app.errorhandler(413)
+def error413(e):
+    return render_template('index.html', error_message="Maximum file size is 10 MB (megabytes). Please upload a smaller file."), 413
 
 @app.route('/upload_media_details', methods=['GET', 'POST'])
 def upload_media_details():
@@ -380,7 +382,7 @@ def singleitemview():
     mediaid = request.args.get('mediaid')
     print(mediaid)
     results = query_singleitem_db(str(mediaid))
-    if results is None or len(results) ==0: 
+    if results is None or len(results) ==0:
             html_code = render_template('no_such_item.html')
             response = make_response(html_code)
             return response
@@ -441,14 +443,14 @@ def admin_singleitemview():
         mediaid = request.args.get('mediaid')
         results = query_singleitem_db(str(mediaid))
 
-        if results is None or len(results) ==0: 
+        if results is None or len(results) ==0:
             html_code = render_template('no_such_item.html')
             response = make_response(html_code)
             return response
 
         result = results[0]
 
-    
+
         print(result)
 
         mediatype = result[9]
@@ -499,7 +501,7 @@ def admin_edit():
     ##displaying previously values
     mediaid = request.args.get('mediaid')
     results = query_singleitem_db(str(mediaid))
-    if results is None or len(results) ==0: 
+    if results is None or len(results) ==0:
         html_code = render_template('no_such_item.html')
         response = make_response(html_code)
         return response
@@ -559,8 +561,8 @@ def admin_edit():
 
     if result[10] == "":
         result_dict["tags"] = None
-    
-    
+
+
     html_code = render_template('admin_edit.html', tags = tags, result_dict = result_dict, mediaid=mediaid)
     response = make_response(html_code)
     return response
