@@ -40,7 +40,7 @@
           <button onclick="window.location.href='/admin_edit?mediaid={{mediaid}}';">Edit</button>
         </div>
     <hr>
-    <div style="display: flex;
+    <div style="display: flex; margin-right: 100px; margin-left: 100px;
     align-items: center;
     justify-content: center; flex-direction: column;">
     <h2>{{result_dict["title"]}}</h2>
@@ -69,6 +69,11 @@
     {% endif %}
 
     </div>
+
+    <form method="get" action="/admin_gallery">
+      <input name="btn_identifier" value="approve" type="hidden">
+      <input type="submit" name="return" value="Return to Admin Gallery">
+    </form>
 
 
 

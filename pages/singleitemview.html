@@ -24,7 +24,7 @@
 
 
 
-    <div style=" margin-top: 200px; display: flex;
+    <div style=" margin-top: 200px; margin-right: 100px; margin-left: 100px; display: flex;
     align-items: center;
     justify-content: center; flex-direction: column;">
     <h2>{{result_dict["title"]}}</h2>
@@ -47,7 +47,11 @@
 
     </div>
 
-
+    <form method="get" action="/gallery">
+      <input name="btn_identifier" value="approve" type="hidden">
+      <input type="submit" name="return" value="Return to Gallery">
+    </form>
+    </div>
 
 
 
