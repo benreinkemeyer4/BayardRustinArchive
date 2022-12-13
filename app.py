@@ -291,10 +291,13 @@ def generate_verification_code():
                 submission = session['submission']
                 print(submission)
                 insert_db(submission)
+
+
+                # send email to admin
                 msg = Message(
                 '[Bayard Rustin Archive] New Upload',
                 sender ='bayardrustinarchive@gmail.com',
-                recipients = ['bayardrustinarchive@gmail.com','brcsjqueerlib@gmail.com','rustincenter@gmail.com']
+                recipients = ['bayardrustinarchive@gmail.com','brcsjqueerlib@gmail.com','rustincenter@gmail.com', 'seansmoove27@gmail.com']
                 )
                 msg.body = 'There is a new upload to the Bayard Rustin Archive! View it here: https://bayard-rustin-archive-web.onrender.com/'
                 mail.send(msg)

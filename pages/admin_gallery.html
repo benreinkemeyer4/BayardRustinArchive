@@ -86,6 +86,7 @@
       var table = $('#gallery').DataTable({
           orderCellsTop: true,
           fixedHeader: true,
+          order: [[2, 'desc']],
           initComplete: function () {
               var api = this.api();
 
