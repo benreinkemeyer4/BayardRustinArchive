@@ -6,6 +6,7 @@ from database.query_db import query_db
 from database.insert_db import insert_db
 from database.query_singleitem_db import query_singleitem_db
 from database.approve_sub import approve_sub
+from database.unapprove_sub import unapprove_sub
 from database.delete_db import delete_db
 from database.edit_db import edit_db
 import auth
@@ -451,9 +452,13 @@ def admin_singleitemview():
             mediaid = request.form.get('mediaid')
             delete_db(str(mediaid))
             return redirect('/admin_gallery')
-        else:
+        elif request.form.get('btn_identifier') == 'approve':
             mediaid = request.form.get('mediaid')
             approve_sub(str(mediaid))
+            return redirect('/admin_gallery')
+        else:
+            mediaid = request.form.get('mediaid')
+            unapprove_sub(str(mediaid))
             return redirect('/admin_gallery')
 
     else:
@@ -487,7 +492,8 @@ def admin_singleitemview():
             "mediatype": mediatype,
             "tags": result[10],
             "mediaid":result[0],
-            "submitter-pronouns":result[11]
+            "submitter-pronouns":result[11], 
+            "approved": result[8]
         }
             html_code = render_template('admin_singleitemview.html', result_dict=result_dict, mediaid=mediaid)
             response = make_response(html_code)
@@ -505,7 +511,8 @@ def admin_singleitemview():
             "mediatype": mediatype,
             "tags": result[10],
             "mediaid":result[0],
-            "submitter-pronouns":result[11]
+            "submitter-pronouns":result[11],
+            "approved": result[8]
         }
         html_code = render_template('admin_singleitemview.html', result_dict=result_dict, mediaid=mediaid)
         response = make_response(html_code)
