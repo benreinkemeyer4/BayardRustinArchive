@@ -5,7 +5,7 @@ import urllib.parse as up
 url = up.urlparse("postgres://oegsfiae:WUg1B4yX8l8PXcVH_E87mjkgD6IfcTOV@peanut.db.elephantsql.com/oegsfiae")
 
 
-def query_db():
+def query_admin():
     try:
         up.uses_netloc.append("postgres")
 
@@ -19,13 +19,17 @@ def query_db():
         # Create a cursor to perform database operations
         cursor = connection.cursor()
         # Executing a SQL query
-        cursor.execute("SELECT * FROM public.submissions;")
+        cursor.execute("SELECT * FROM public.admins;")
         # Fetch result
         record = cursor.fetchall()
-        return record
+        emails = []
+        for r in record:
+            emails.append(r[1])
+        return {"result":emails, "error":False}
 
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL", error)
+        return {"error":True, "result":error}
 
     finally:
         if (connection):

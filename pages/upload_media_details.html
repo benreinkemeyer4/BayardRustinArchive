@@ -27,7 +27,7 @@
       <div class="col">
       <div class="form-group">
         <label>Submitter Name</label>
-        <input name="submitter-name" class="form-control" style="width:50%" required maxlength="70">
+        <input name="submitter-name" class="form-control" style="width:50%" required maxlength="20">
       </div>
     </div>
 
@@ -44,7 +44,7 @@
       <div class="col">
       <div class="form-group">
         <label>Submitter Email</label>
-        <input type="email" name="submitter-email" class="form-control" style="width:50%" required maxlength="70"
+        <input type="email" name="submitter-email" class="form-control" style="width:50%" required maxlength="30"
         pattern="[^@\s]+@[^@\s]+\.[^@\s]+">
       </div>
       </div>
@@ -53,7 +53,7 @@
       <div class="col">
         <div class="form-group">
           <label>Submitter Pronouns</label>
-          <input name="submitter-pronouns" class="form-control" style="width:50%" required maxlength="70">
+          <input name="submitter-pronouns" class="form-control" style="width:50%" required maxlength="30">
 
 
         </div>
@@ -82,7 +82,7 @@
       <div class="col">
       <div class="form-group">
         <label>Title</label>
-        <input name="title" class="form-control" required maxlength="100">
+        <input name="title" class="form-control" required maxlength="50">
       </div>
     </div>
     </div>
@@ -92,7 +92,8 @@
       <div class="col">
       <div class="form-group">
         <label>Description</label>
-        <textarea name="description" class="form-control" style="height:100px" required maxlength="2000"></textarea>
+        <textarea name="description" class="form-control" style="height:100px" required maxlength="2000"
+        minlength="75"></textarea>
       </div>
     </div>
     </div>
