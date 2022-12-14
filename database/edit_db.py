@@ -32,12 +32,14 @@ def edit_db(submission):
         # Executing a SQL query
         #cursor.execute('''INSERT INTO submissions (name,date_taken,date_uploaded,email,tags,title,description,media_url) VALUES ('Bob Dylan', '1993-03-15','2022-10-29', 'sw42@princeton.edu', 'document', 'test', 'test', 'test');''')
 
-        stmt = '''UPDATE submissions 
+        stmt = '''UPDATE submissions
         SET name = %s, date_taken=%s, email=%s, tags=%s, title=%s, description=%s, pronouns=%s
         WHERE submission_id = %s;'''
         cursor.execute(stmt, (sub_name, date_taken, sub_email, tags, title, desc, sub_pronouns, mediaid))
         connection.commit()
         print("1 Record edited successfully")
+
+        return True
         # Fetch result
         # cursor.execute("SELECT * from submissions")
         # record = cursor.fetchall()
@@ -45,6 +47,7 @@ def edit_db(submission):
 
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL", error)
+        return False
 
     finally:
         if (connection):

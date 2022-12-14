@@ -38,6 +38,8 @@ def insert_db(submission):
         cursor.execute(stmt, (sub_name, date_taken, date_uploaded, sub_email, tags, title, desc, media_url, media_type, sub_pronouns))
         connection.commit()
         print("1 Record inserted successfully")
+
+        return True
         # Fetch result
         # cursor.execute("SELECT * from submissions")
         # record = cursor.fetchall()
@@ -45,6 +47,7 @@ def insert_db(submission):
 
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL", error)
+        return False
 
     finally:
         if (connection):
