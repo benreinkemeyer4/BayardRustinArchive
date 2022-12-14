@@ -19,6 +19,8 @@ from dotenv import load_dotenv
 from twilio.base.exceptions import TwilioRestException
 import cloudinary_methods
 
+
+
 ALLOWED_EXTENSIONS = {'pdf', 'jpg', 'jpeg'}
 UPLOAD_FOLDER = './uploads'
 
@@ -26,6 +28,12 @@ load_dotenv()
 # current directory
 app = Flask(__name__, template_folder='./pages')
 app.secret_key = "secret key"
+
+
+
+# 10 Mb limit
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
+
 
 mail = Mail(app)
 #mail config
@@ -61,6 +69,7 @@ media_type = ""
 
 tags = ["1963 March on Washington for Jobs and Freedom", "Paper", "Pamphlet", "Leaflet", "Video", "Audio", "Essay", "Book", "Photograph", "Research", "Personal", "Interaction", "Story", "Speech", "Activism", "Gandhi", "Civil Rights", "LGBTQIA+ rights", "Intersectionality", "Labor Rights", "Voting Rights", "Union", "AFL-CIO", "Black Power", "Organizer", "Martin Luther King", "A. Philip Randolph", "Pacifism", "Quaker", "Protest", "Boycott", "Sit-in", "News", "Queer", "Africa", "Zambia", "Malcolm X", "President Obama", "Southern Christian Leadership Conference", "Freedom Riders", "Medal of Freedom", "Walter Naegle", "Bayard Rustin Center For Social Justice"]
 
+tags.sort()
 
 def video_id(value):
     """
@@ -137,17 +146,12 @@ def index():
             else:
                 type = "Image"
 
-            file.seek(0, os.SEEK_END)
-            file_length = file.tell()
-            print(file_length)
 
-            if file_length > 10000000:
-                flash('Maximum file size is 10 MB (megabytes)')
-                return redirect(request.url)
-            else:
-                file.seek(0)
-                #upload to cloudinary
-                url = cloudinary_methods.upload(file)
+            #upload to cloudinary
+            res = cloudinary_methods.upload(file)
+
+            if res["error"] == False:
+                url = res["result"]
 
                 global media_url
                 global media_type
@@ -157,6 +161,9 @@ def index():
 
                 print('File successfully uploaded')
                 return redirect(url_for('upload_media_details'))
+            else:
+                return render_template('index.html', error_message="File unable to be uploaded to Cloudinary. Please try again.")
+
         else:
             print('Allowed file types are pdf, jpg, jpeg')
             flash('Allowed file types are pdf, jpg, jpeg')
@@ -167,8 +174,11 @@ def index():
     response = make_response(html_code)
     return response
 
-#     #request.form['customFileInput']
 
+
+@app.errorhandler(413)
+def error413(e):
+    return render_template('index.html', error_message="Maximum file size is 10 MB (megabytes). Please upload a smaller file."), 413
 
 @app.route('/upload_media_details', methods=['GET', 'POST'])
 def upload_media_details():
@@ -290,10 +300,13 @@ def generate_verification_code():
                 submission = session['submission']
                 print(submission)
                 insert_db(submission)
+
+
+                # send email to admin
                 msg = Message(
                 '[Bayard Rustin Archive] New Upload',
                 sender ='bayardrustinarchive@gmail.com',
-                recipients = ['bayardrustinarchive@gmail.com'] #change to their actual emails eventually
+                recipients = ['bayardrustinarchive@gmail.com','brcsjqueerlib@gmail.com','rustincenter@gmail.com', 'seansmoove27@gmail.com']
                 )
                 msg.body = 'There is a new upload to the Bayard Rustin Archive! View it here: https://bayard-rustin-archive-web.onrender.com/'
                 mail.send(msg)
@@ -352,7 +365,6 @@ def gallery():
 def admin_gallery():
     # id, name, date created, date submitted, email, title, description, media url, approved, media_type, tags
     # 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-    username = auth.authenticate()
     results = query_db()
     print(results)
 
@@ -381,11 +393,20 @@ def singleitemview():
     mediaid = request.args.get('mediaid')
     print(mediaid)
     results = query_singleitem_db(str(mediaid))
-    if results is None or len(results) ==0: 
+
+
+
+    if results is None or len(results) ==0:
             html_code = render_template('no_such_item.html')
             response = make_response(html_code)
             return response
     result = results[0]
+
+    approved = result[8]
+    if not approved:
+        html_code = render_template('no_such_item.html')
+        response = make_response(html_code)
+        return response
 
     mediatype = result[9]
     mediaurl = result[7]
@@ -408,7 +429,7 @@ def singleitemview():
         return response
 
 
-
+    # non video
     result_dict = {
             "title": result[5],
             "desc": result[6],
@@ -426,7 +447,6 @@ def singleitemview():
 
 @app.route('/admin_details', methods=['GET', 'POST'])
 def admin_singleitemview():
-    username = auth.authenticate()
     if request.method == 'POST':
         if request.form.get('btn_identifier') == 'delete':
             mediaid = request.form.get('mediaid')
@@ -446,14 +466,14 @@ def admin_singleitemview():
         mediaid = request.args.get('mediaid')
         results = query_singleitem_db(str(mediaid))
 
-        if results is None or len(results) ==0: 
+        if results is None or len(results) ==0:
             html_code = render_template('no_such_item.html')
             response = make_response(html_code)
             return response
 
         result = results[0]
 
-    
+
         print(result)
 
         mediatype = result[9]
@@ -500,18 +520,17 @@ def admin_singleitemview():
 
 @app.route('/admin_edit', methods=['GET', 'POST']) #why is it both? which cases would they be?
 def admin_edit():
-    username = auth.authenticate()
     global tags
     user_tags = []
-    ##displaying previously values
+    # displaying previously values
     mediaid = request.args.get('mediaid')
     results = query_singleitem_db(str(mediaid))
-    if results is None or len(results) ==0: 
+    if results is None or len(results) ==0:
         html_code = render_template('no_such_item.html')
         response = make_response(html_code)
         return response
     if request.method == 'POST':
-        ##when they submit edits
+        # when they submit edits
         for index in request.form.getlist('tags'):
             user_tags.append(tags[int(index)])
         submission = {
@@ -566,8 +585,8 @@ def admin_edit():
 
     if result[10] == "":
         result_dict["tags"] = None
-    
-    
+
+
     html_code = render_template('admin_edit.html', tags = tags, result_dict = result_dict, mediaid=mediaid)
     response = make_response(html_code)
     return response

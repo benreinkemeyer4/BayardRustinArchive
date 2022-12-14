@@ -33,13 +33,13 @@
     <!-- --------------------------- -->
     <div method="get" style="width:85%; margin-top: 2%;" class="container">
       <div class="row">
-
         {% for result_dict in results_dict_list: %}
               {% if result_dict.approved == True %}
                   {% if result_dict.mediatype == "Image"%}
                   <div class="col">
                   <a href="/details?mediaid={{result_dict.id}}">
-                    <img src="{{result_dict.mediaurl}}" width="300" height="300" alt="{{result_dict.title}}">
+                    <img src="{{result_dict.mediaurl}}" width="300" height="300" alt="{{result_dict.title}}"
+                    style="object-fit:cover;width:300px;height:300px">
                     <p>{{result_dict.title}}</p>
                   </a>
                 </div>

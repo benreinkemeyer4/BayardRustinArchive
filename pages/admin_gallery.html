@@ -11,6 +11,7 @@
     <link href=https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.20/css/dataTables.bootstrap4.min.css rel=stylesheet>
     <script src="https://kit.fontawesome.com/d630d1cdd4.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="./static/style.css">
+    <link href="https://fonts.cdnfonts.com/css/american-typewriter" rel="stylesheet">
 
     <title>Bayard Rustin Archive</title>
     <script src=
@@ -18,7 +19,7 @@
  </script>
 </head>
 
-<body style = "font-family: 'American Typewriter', sans-serif;">
+<body>
   {% include 'header.html' %}
 
 
@@ -86,6 +87,7 @@
       var table = $('#gallery').DataTable({
           orderCellsTop: true,
           fixedHeader: true,
+          order: [[2, 'desc']],
           initComplete: function () {
               var api = this.api();
 

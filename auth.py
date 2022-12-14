@@ -1,18 +1,11 @@
 #!/usr/bin/env python
 
-#-----------------------------------------------------------------------
-# auth.py
-# Author: Bob Dondero
-#   With lots of help from https://realpython.com/flask-google-login/
-#-----------------------------------------------------------------------
-
 import os
-import sys
 import json
 import requests
 import flask
 import oauthlib.oauth2
-
+from database.query_admin import query_admin
 #-----------------------------------------------------------------------
 
 GOOGLE_DISCOVERY_URL = (
@@ -24,7 +17,6 @@ GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
 
 client = oauthlib.oauth2.WebApplicationClient(GOOGLE_CLIENT_ID)
-
 #-----------------------------------------------------------------------
 
 def login():
@@ -124,9 +116,20 @@ def callback():
     # if not userinfo_response.json().get('email_verified'):
     #     message = 'User email not available or not verified by Google.'
     #     return message, 400
-    validemails = {"kxli@princeton.edu", "johnsonan299@gmail.com", "sw42@princeton.edu", "al52@princeton.edu", "brr2@princeton.edu", "sc73@princeton.edu", "brcsjqueerlib@gmail.com", "rustincenter@gmail.com",
-    "seansmoove27@gmail.com", "bayardrustinarchive@gmail.com"}
-    if not userinfo_response.json()['email'] in validemails:
+
+
+    res = query_admin()
+
+    valid_emails = None
+    if not res["error"]:
+        valid_emails = res["result"]
+    else:
+        # hard coded if something happens with database
+        valid_emails = {"kxli@princeton.edu", "johnsonan299@gmail.com", "sw42@princeton.edu", "al52@princeton.edu", "brr2@princeton.edu", "sc73@princeton.edu", "brcsjqueerlib@gmail.com", "rustincenter@gmail.com",
+    "seansmoove27@gmail.com", "bayardrustinarchive@gmail.com", "aj3189@princeton.edu","andrac@princeton.edu","rdondero@princeton.edu"}
+
+
+    if not userinfo_response.json()['email'] in valid_emails:
         return flask.redirect(flask.url_for('unauthorized_page'))
 
     # Save the user profile data in the session.
@@ -144,15 +147,6 @@ def callback():
 
     return flask.redirect(flask.url_for('admin_gallery'))
 
-#-----------------------------------------------------------------------
-
-def logoutapp():
-
-    # Log out of the application.
-    flask.session.clear()
-    html_code = flask.render_template('loggedout.html')
-    response = flask.make_response(html_code)
-    return response
 
 #-----------------------------------------------------------------------
 

@@ -26,17 +26,20 @@
 
       <div style="margin-top: 200px;display: flex;
       align-items: center;
-      justify-content: center; flex-direction: row; justify-content: space-around; margin-left: 30%; margin-right: 30%;">
-          <form method="post" action="/admin_details">
+
+      justify-content: center; flex-direction: row; justify-content: space-around; margin-left: 30%; margin-right: 30%;"  class="container-fluid">
+          <form method="post" action="/admin_details"  style="margin-right:5px">
+
             <input name="btn_identifier" value="delete" type="hidden">
             <input name="mediaid" value="{{result_dict.mediaid}}" type="hidden">
-            <input type="submit" name="delete" value="Delete" onclick="clicked(event)">
+            <input type="submit" name="delete" value="Delete" onclick="clicked(event)"  class="btn btn-primary">
           </form>
+          
           {% if result_dict.approved == False %}
-          <form method="post" action="/admin_details">
+          <form method="post" action="/admin_details style="margin-right:5px">
             <input name="btn_identifier" value="approve" type="hidden">
             <input name="mediaid" value="{{result_dict.mediaid}}" type="hidden">
-            <input type="submit" name="approve" value="Approve">
+            <input type="submit" name="approve" value="Approve"  class="btn btn-primary">
           </form>
           {% endif %}
           {% if result_dict.approved == True %}
@@ -46,10 +49,12 @@
             <input type="submit" name="unapprove" value="Unapprove">
           </form>
           {% endif %}
-          <button onclick="window.location.href='/admin_edit?mediaid={{mediaid}}';">Edit</button>
+          <button onclick="window.location.href='/admin_edit?mediaid={{mediaid}}';"  class="btn btn-primary">Edit</button>
+
         </div>
-    <hr>
-    <div style="display: flex;
+        <br>
+
+    <div style="display: flex; margin-right: 100px; margin-left: 100px;
     align-items: center;
     justify-content: center; flex-direction: column;">
     <h2>{{result_dict["title"]}}</h2>
@@ -68,7 +73,7 @@
 
     {% if result_dict["mediatype"] == "Image"%}
     <a href="{{result_dict.mediaurl}}" download = "{{result_dict.mediaurl}}"><img src="{{result_dict.mediaurl}}" width="800px"/></a>
-    
+
     {% elif result_dict["mediatype"] == "Document" %}
     <embed src="{{result_dict.mediaurl}}" width="800px" height="2100px" />
     {% elif result_dict["mediatype"] == "Video" %}
@@ -77,7 +82,13 @@
     </iframe>
     {% endif %}
 
+    <form method="get" action="/admin_gallery">
+      <input name="btn_identifier" value="approve" type="hidden">
+      <input type="submit" name="return" value="Return to Admin Gallery" class="btn btn-primary" style="margin-top: 5px;">
+    </form>
     </div>
+
+
 
 
 
