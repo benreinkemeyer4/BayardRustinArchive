@@ -26,17 +26,26 @@
 
       <div style="margin-top: 200px;display: flex;
       align-items: center;
-      justify-content: center; flex-direction: column;">
+      justify-content: center; flex-direction: row; justify-content: space-around; margin-left: 30%; margin-right: 30%;">
           <form method="post" action="/admin_details">
             <input name="btn_identifier" value="delete" type="hidden">
             <input name="mediaid" value="{{result_dict.mediaid}}" type="hidden">
             <input type="submit" name="delete" value="Delete" onclick="clicked(event)">
           </form>
+          {% if result_dict.approved == False %}
           <form method="post" action="/admin_details">
             <input name="btn_identifier" value="approve" type="hidden">
             <input name="mediaid" value="{{result_dict.mediaid}}" type="hidden">
             <input type="submit" name="approve" value="Approve">
           </form>
+          {% endif %}
+          {% if result_dict.approved == True %}
+          <form method="post" action="/admin_details">
+            <input name="btn_identifier" value="unapprove" type="hidden">
+            <input name="mediaid" value="{{result_dict.mediaid}}" type="hidden">
+            <input type="submit" name="unapprove" value="Unapprove">
+          </form>
+          {% endif %}
           <button onclick="window.location.href='/admin_edit?mediaid={{mediaid}}';">Edit</button>
         </div>
     <hr>
