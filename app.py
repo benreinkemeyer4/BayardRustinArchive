@@ -109,10 +109,6 @@ def login():
 def callback():
     return auth.callback()
 
-@app.route('/logoutapp', methods=['GET'])
-def logoutapp():
-    return auth.logoutapp()
-
 @app.route('/logoutgoogle', methods=['GET'])
 def logoutgoogle():
     session['logged_in'] = False
@@ -188,13 +184,17 @@ def upload_media_details():
         if recaptcha.verify(): # Use verify() method to see if ReCaptcha is filled out
             user_tags = []
             to_email = request.form.get('submitter-email')
-            print(to_email)
             session['to_email'] = to_email
 
-            send_verification(to_email)
+            status = send_verification(to_email)
+
+            if not status:
+                return render_template('upload_media_details.html', error_message="Unable to send verification code. Please resubmit the form again.")
 
             for index in request.form.getlist('tags'):
                 user_tags.append(tags[int(index)])
+
+
             submission = {
                 "submitter-name": request.form.get('submitter-name'),
                 "date_taken": request.form.get('date'),
@@ -217,12 +217,14 @@ def upload_media_details():
     return response
 
 def send_verification(to_email):
-    print(to_email)
-    verification = client.verify \
-        .services(TWILIO_VERIFY_SERVICE) \
-        .verifications \
-        .create(to=to_email, channel='email')
-    print(verification.status)
+    try:
+        verification = client.verify \
+            .services(TWILIO_VERIFY_SERVICE) \
+            .verifications \
+            .create(to=to_email, channel='email')
+        return verification.status
+    except Exception:
+        return False
 
 @app.route('/video_instructions', methods=['GET', "POST"])
 def video_instructions():
@@ -246,7 +248,11 @@ def upload_video_details():
             print(to_email)
             session['to_email'] = to_email
 
-            send_verification(to_email)
+            status = send_verification(to_email)
+
+            if not status:
+                return render_template('upload_video_details.html', error_message="Unable to send verification code. Please resubmit the form again.")
+
             for index in request.form.getlist('tags'):
                 user_tags.append(tags[int(index)])
             submission = {
@@ -273,12 +279,14 @@ def upload_video_details():
     return response
 
 def send_verification(to_email):
-    print(to_email)
-    verification = client.verify \
-        .services(TWILIO_VERIFY_SERVICE) \
-        .verifications \
-        .create(to=to_email, channel='email')
-    print(verification.status)
+    try:
+        verification = client.verify \
+            .services(TWILIO_VERIFY_SERVICE) \
+            .verifications \
+            .create(to=to_email, channel='email')
+        return verification.status
+    except Exception:
+        return False
 
 @app.route('/unauthorized_page', methods=['GET'])
 def unauthorized_page():
@@ -294,19 +302,24 @@ def generate_verification_code():
         verification_code = request.form['verificationcode']
 
         status = check_verification_token(to_email, verification_code)
-        print(status)
+
         if not status["error"]:
             if status["approved"]:
                 submission = session['submission']
                 print(submission)
-                insert_db(submission)
+
+
+                inserted = insert_db(submission)
+
+                if not inserted:
+                    return render_template('upload_video_details.html', error_message="Unable to submit submission. Please resubmit the form again.")
 
 
                 # send email to admin
                 msg = Message(
                 '[Bayard Rustin Archive] New Upload',
                 sender ='bayardrustinarchive@gmail.com',
-                recipients = ['bayardrustinarchive@gmail.com','brcsjqueerlib@gmail.com','rustincenter@gmail.com', 'seansmoove27@gmail.com']
+                recipients = ['bayardrustinarchive@gmail.com','brcsjqueerlib@gmail.com','rustincenter@gmail.com']
                 )
                 msg.body = 'There is a new upload to the Bayard Rustin Archive! View it here: https://bayard-rustin-archive-web.onrender.com/'
                 mail.send(msg)
@@ -340,8 +353,14 @@ def thank_you():
 
 @app.route('/gallery', methods=['GET'])
 def gallery():
-    results = query_db()
-    print(results)
+    status_results = query_db()
+
+    if status_results["error"]:
+        html_code = render_template('db_error.html')
+        response = make_response(html_code)
+        return response
+
+    results = status_results["res"]
     results_dict_list = []
     for result in results:
         result_dict = {
@@ -365,8 +384,14 @@ def gallery():
 def admin_gallery():
     # id, name, date created, date submitted, email, title, description, media url, approved, media_type, tags
     # 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
-    results = query_db()
-    print(results)
+    status_results = query_db()
+
+    if status_results["error"]:
+        html_code = render_template('db_error.html')
+        response = make_response(html_code)
+        return response
+
+    results = status_results["res"]
 
     results_dict_list = []
     for result in results:
@@ -391,9 +416,14 @@ def admin_gallery():
 @app.route('/details', methods=['GET'])
 def singleitemview():
     mediaid = request.args.get('mediaid')
-    print(mediaid)
-    results = query_singleitem_db(str(mediaid))
+    status_results = query_singleitem_db(str(mediaid))
 
+    if status_results["error"]:
+        html_code = render_template('db_error.html')
+        response = make_response(html_code)
+        return response
+
+    results = status_results["res"]
 
 
     if results is None or len(results) ==0:
@@ -402,6 +432,7 @@ def singleitemview():
             return response
     result = results[0]
 
+    # prevents attcker from cycling through media ids to find unapproved media
     approved = result[8]
     if not approved:
         html_code = render_template('no_such_item.html')
@@ -448,23 +479,58 @@ def singleitemview():
 @app.route('/admin_details', methods=['GET', 'POST'])
 def admin_singleitemview():
     if request.method == 'POST':
+        mediaid = request.form.get('mediaid')
+
+        # attacker tries to change mediaid when approving, deleting, etc.
+        if (mediaid is None) or (mediaid.strip() == ''):
+            redirect(url_for('unauthorized_page'))
+        # delete media
         if request.form.get('btn_identifier') == 'delete':
-            mediaid = request.form.get('mediaid')
-            delete_db(str(mediaid))
-            return redirect('/admin_gallery')
+
+            deleted = delete_db(str(mediaid))
+
+            if deleted:
+                return redirect('/admin_gallery')
+            else:
+                html_code = render_template('no_such_item.html')
+                response = make_response(html_code)
+                return response
+
+        # approve media
         elif request.form.get('btn_identifier') == 'approve':
-            mediaid = request.form.get('mediaid')
-            approve_sub(str(mediaid))
-            return redirect('/admin_gallery')
+            approved = approve_sub(str(mediaid))
+            if approved:
+                return redirect('/admin_gallery')
+            else:
+                html_code = render_template('no_such_item.html')
+                response = make_response(html_code)
+                return response
+        # unapprove media
         else:
-            mediaid = request.form.get('mediaid')
-            unapprove_sub(str(mediaid))
-            return redirect('/admin_gallery')
+            unapproved = unapprove_sub(str(mediaid))
+            if unapproved:
+                return redirect('/admin_gallery')
+            else:
+                html_code = render_template('no_such_item.html')
+                response = make_response(html_code)
+                return response
 
+    # GET Request
     else:
-
         mediaid = request.args.get('mediaid')
-        results = query_singleitem_db(str(mediaid))
+
+        # attacker tries to change mediaid to empty
+        if (mediaid is None) or (mediaid.strip() == ''):
+            redirect(url_for('unauthorized_page'))
+
+        status_results = query_singleitem_db(str(mediaid))
+
+        if status_results["error"]:
+            html_code = render_template('db_error.html')
+            response = make_response(html_code)
+            return response
+
+        results = status_results["res"]
 
         if results is None or len(results) ==0:
             html_code = render_template('no_such_item.html')
@@ -472,9 +538,6 @@ def admin_singleitemview():
             return response
 
         result = results[0]
-
-
-        print(result)
 
         mediatype = result[9]
         mediaurl = result[7]
@@ -492,7 +555,7 @@ def admin_singleitemview():
             "mediatype": mediatype,
             "tags": result[10],
             "mediaid":result[0],
-            "submitter-pronouns":result[11], 
+            "submitter-pronouns":result[11],
             "approved": result[8]
         }
             html_code = render_template('admin_singleitemview.html', result_dict=result_dict, mediaid=mediaid)
@@ -501,7 +564,7 @@ def admin_singleitemview():
 
 
 
-
+        # non video media
         result_dict = {
             "title": result[5],
             "desc": result[6],
@@ -518,13 +581,27 @@ def admin_singleitemview():
         response = make_response(html_code)
         return response
 
-@app.route('/admin_edit', methods=['GET', 'POST']) #why is it both? which cases would they be?
+@app.route('/admin_edit', methods=['GET', 'POST'])
 def admin_edit():
     global tags
     user_tags = []
     # displaying previously values
     mediaid = request.args.get('mediaid')
-    results = query_singleitem_db(str(mediaid))
+
+    # attacker tries to change mediaid to empty
+    if (mediaid is None) or (mediaid.strip() == ''):
+        redirect(url_for('unauthorized_page'))
+
+
+    status_results = query_singleitem_db(str(mediaid))
+
+    if status_results["error"]:
+        html_code = render_template('db_error.html')
+        response = make_response(html_code)
+        return response
+
+    results = status_results["res"]
+
     if results is None or len(results) ==0:
         html_code = render_template('no_such_item.html')
         response = make_response(html_code)
@@ -543,9 +620,14 @@ def admin_edit():
             "description": request.form.get('description'),
             "mediaid": mediaid
         }
-        edit_db(submission)
-        url = 'admin_details?mediaid=' + str(mediaid)
-        return redirect(url) #change this to going back to original media id
+        edited = edit_db(submission)
+        if edited:
+            url = 'admin_details?mediaid=' + str(mediaid)
+            return redirect(url) #change this to going back to original media id
+        else:
+            html_code = render_template('no_such_item.html')
+            response = make_response(html_code)
+            return response
 
 
     result = results[0]
@@ -613,7 +695,16 @@ def about_us():
 # Add special icon gallery view
 @app.route('/gallery_icon', methods=['GET'])
 def gallery_icon():
-    results = query_db()
+
+    status_results = query_db()
+
+    if status_results["error"]:
+        html_code = render_template('db_error.html')
+        response = make_response(html_code)
+        return response
+
+    results = status_results["res"]
+
     print(results)
     results_dict_list = []
     for result in results:

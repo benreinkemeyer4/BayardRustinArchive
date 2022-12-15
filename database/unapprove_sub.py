@@ -28,9 +28,11 @@ def unapprove_sub(media_id):
         cursor.execute("SELECT * from submissions WHERE submission_id = %s", (media_id,))
         record = cursor.fetchall()
         print("Result ", record)
+        return True
 
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL", error)
+        return False
 
     finally:
         if (connection):

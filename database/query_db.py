@@ -22,10 +22,13 @@ def query_db():
         cursor.execute("SELECT * FROM public.submissions;")
         # Fetch result
         record = cursor.fetchall()
-        return record
+
+        return {"res": record, "error":False}
 
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL", error)
+
+        return {"res": error, "error":True}
 
     finally:
         if (connection):

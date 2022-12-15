@@ -104,7 +104,7 @@
       <div class="col">
       <div class="form-group">
         <label>Description</label>
-        <textarea name="description" class="form-control" style="height:100px" required maxlength="2000" minlength="75" ></textarea>
+        <textarea name="description" class="form-control" style="height:100px" required maxlength="300" ></textarea>
       </div>
     </div>
     </div>
@@ -112,6 +112,10 @@
     {{ recaptcha }}
 
     <p>{{ message }}</p>
+    {% if error_message %}
+      <p>{{error_message}}</p>
+
+      {% endif %}
 
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>

@@ -26,27 +26,26 @@
 
       <div style="margin-top: 200px;display: flex;
       align-items: center;
-
-      justify-content: center; flex-direction: row; justify-content: space-around; margin-left: 30%; margin-right: 30%;"  class="container-fluid">
+      justify-content: center; flex-direction: row; justify-content: space-around;"  class="container-fluid">
           <form method="post" action="/admin_details"  style="margin-right:5px">
 
             <input name="btn_identifier" value="delete" type="hidden">
             <input name="mediaid" value="{{result_dict.mediaid}}" type="hidden">
             <input type="submit" name="delete" value="Delete" onclick="clicked(event)"  class="btn btn-primary">
           </form>
-          
+
           {% if result_dict.approved == False %}
-          <form method="post" action="/admin_details style="margin-right:5px">
+          <form method="post" action="/admin_details" style="margin-right:5px">
             <input name="btn_identifier" value="approve" type="hidden">
             <input name="mediaid" value="{{result_dict.mediaid}}" type="hidden">
-            <input type="submit" name="approve" value="Approve"  class="btn btn-primary">
+            <input type="submit" name="approve" value="Approve"   class="btn btn-primary">
           </form>
           {% endif %}
           {% if result_dict.approved == True %}
           <form method="post" action="/admin_details">
             <input name="btn_identifier" value="unapprove" type="hidden">
             <input name="mediaid" value="{{result_dict.mediaid}}" type="hidden">
-            <input type="submit" name="unapprove" value="Unapprove">
+            <input type="submit" name="unapprove" value="Unapprove" class="btn btn-primary">
           </form>
           {% endif %}
           <button onclick="window.location.href='/admin_edit?mediaid={{mediaid}}';"  class="btn btn-primary">Edit</button>
@@ -69,7 +68,7 @@
     <strong>Contributor Pronouns: </strong>{{result_dict["submitter-pronouns"]}}<br>
     <strong>Contributor Emails: </strong><a href="mailto:{{result_dict["submitter-email"]}}">{{result_dict["submitter-email"]}}</a><br>
 
-
+    <div style="margin-top: 2%;">
 
     {% if result_dict["mediatype"] == "Image"%}
     <a href="{{result_dict.mediaurl}}" download = "{{result_dict.mediaurl}}"><img src="{{result_dict.mediaurl}}" width="800px"/></a>
@@ -81,9 +80,9 @@
     src="{{result_dict.mediaurl}}">
     </iframe>
     {% endif %}
+  </div>
 
     <form method="get" action="/admin_gallery">
-      <input name="btn_identifier" value="approve" type="hidden">
       <input type="submit" name="return" value="Return to Admin Gallery" class="btn btn-primary" style="margin-top: 5px;">
     </form>
     </div>
@@ -106,6 +105,8 @@
 
     <script src="https://apis.google.com/js/platform.js" async defer></script>
 
+
+
     <script>
        function clicked(e)
       {
@@ -113,7 +114,8 @@
           e.preventDefault();
 
       }
-    </script>
+      </script>
+
 {% include 'footer.html' %}
   </body>
 </html>

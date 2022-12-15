@@ -29,8 +29,11 @@ def approve_sub(media_id):
         record = cursor.fetchall()
         print("Result ", record)
 
+        return True
+
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL", error)
+        return False
 
     finally:
         if (connection):
