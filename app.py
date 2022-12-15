@@ -160,6 +160,7 @@ def index():
                 print('File successfully uploaded')
                 return redirect(url_for('upload_media_details'))
             else:
+                print(res["error"])
                 return render_template('index.html', error_message="File unable to be uploaded to Cloudinary. Please try again.")
 
         else:

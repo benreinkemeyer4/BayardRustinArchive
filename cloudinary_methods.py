@@ -16,5 +16,5 @@ def upload(file):
     upload_result = cloudinary.uploader.upload(file)
     return {"result": upload_result["secure_url"], "error":False}
   except Exception as ex:
-    print(f"{sys.argv[0]}: {ex}", file=sys.stderr)
+    print(f"Error is {ex}")
     return {"result": "Cloudinary Error", "error":True}
