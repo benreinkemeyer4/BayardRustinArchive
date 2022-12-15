@@ -53,7 +53,7 @@
                   {% elif result_dict.mediatype == "Video" %}
                   <div class="col">
                   <a href="/details?mediaid={{result_dict.id}}">
-                    <iframe width="300" height="300"  src="{{result_dict.mediaurl}}"></iframe>
+                    <iframe width="300" height="300"  src="{{result_dict.mediaurl}}" allow="fullscreen"></iframe>
                     <p>{{result_dict.title}}</p>
                   </a>
                 </div>

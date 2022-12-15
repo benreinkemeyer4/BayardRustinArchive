@@ -31,7 +31,7 @@
           <form method="post" action="/admin_details" >
             <input type="hidden" name="csrf_token"
              value="{{csrf_token()}}">
-           
+
             <input name="btn_identifier" value="delete" type="hidden">
             <input name="mediaid" value="{{result_dict.mediaid}}" type="hidden">
             <input type="submit" name="delete" value="Delete" onclick="clicked(event)"  class="btn btn-primary">
@@ -84,7 +84,7 @@
     {% elif result_dict["mediatype"] == "Document" %}
     <embed src="{{result_dict.mediaurl}}" width="800px" height="2100px" />
     {% elif result_dict["mediatype"] == "Video" %}
-    <iframe width="420" height="315"
+    <iframe width="420" height="315" allow="fullscreen"
     src="{{result_dict.mediaurl}}">
     </iframe>
     {% endif %}
