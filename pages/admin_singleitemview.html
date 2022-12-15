@@ -26,17 +26,20 @@
 
       <div style="margin-top: 200px;display: flex;
       align-items: center;
-      justify-content: center; flex-direction: row; justify-content: space-around;"  class="container-fluid">
-          <form method="post" action="/admin_details"  style="margin-right:5px">
+
+      justify-content: center; flex-direction: row; justify-content: space-around; margin-left: 30%; margin-right: 30%;">
+          <form method="post" action="/admin_details" >
             <input type="hidden" name="csrf_token"
              value="{{csrf_token()}}">
+           
             <input name="btn_identifier" value="delete" type="hidden">
             <input name="mediaid" value="{{result_dict.mediaid}}" type="hidden">
             <input type="submit" name="delete" value="Delete" onclick="clicked(event)"  class="btn btn-primary">
           </form>
 
           {% if result_dict.approved == False %}
-          <form method="post" action="/admin_details" style="margin-right:5px">
+
+          <form method="post" action="/admin_details">
             <input type="hidden" name="csrf_token"
              value="{{csrf_token()}}">
             <input name="btn_identifier" value="approve" type="hidden">
@@ -55,7 +58,7 @@
           {% endif %}
           <button onclick="window.location.href='/admin_edit?mediaid={{mediaid}}';"  class="btn btn-primary">Edit</button>
 
-        </div>
+      </div>
         <br>
 
     <div style="display: flex; margin-right: 100px; margin-left: 100px;

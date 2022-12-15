@@ -51,19 +51,23 @@
    </p>
 
       <div class = "container-fluid"style="height:100%; width:80%; outline-style:dashed; outline-color:#DCAC00; border-radius:30px;
-      display: flex; align-items: center; justify-content: center; background-color:#fef1c1">
-         <form action="/" method="post" enctype="multipart/form-data" style = "background-color:#fef1c1;box-sizing:border-box;width: 100%;">
-            <p style = "background-color:#fef1c1">Upload a file with the file dialog.</p>
+      display: flex; align-items: center; justify-content: center; background-color:#fef1c1; text-align:left">
+         <form action="/" method="post" enctype="multipart/form-data" style = "background-color:#fef1c1;
+         box-sizing:border-box;width: 100%; align-items: center; align-self: center; text-align: left;
+         margin-left: 30%;margin-right: 30%;">
+            <p style = "background-color:#fef1c1; box-sizing:border-box;width: 100%;">Upload a file with the file dialog.</p>
 
-            <p style = "background-color:#fef1c1"> Note the allowed file types are: jpeg, jpg, pdf.</p>
+            <p style = "background-color:#fef1c1;box-sizing:border-box;width: 100%;"> Note the allowed file types are: jpeg, jpg, pdf.</p>
 
-            <input style= "background-color:#fef1c1" type="file" name="file" autocomplete="off" required
+            <input style= "background-color:#fef1c1;box-sizing:border-box;width: 100%;"type="file" name="file" autocomplete="off" required
             onchange="validateSize(this)" id="file">
+
 
             <input type="hidden" name="csrf_token"
              value="{{csrf_token()}}">
 
-            <button type="submit" class="btn btn-primary">Next</button>
+            <button type="submit" class="btn btn-primary" style = "margin-top:2%">Next</button>
+
 
           </form>
 

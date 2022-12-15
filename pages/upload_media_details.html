@@ -17,42 +17,42 @@
 <body >
   {% include 'header.html' %}
 
-    <div style="margin-left: 20%;margin-top:10%">
+    <div style="margin-left: 20%;margin-top:200px">
     <h1>Media Details</h1>
     <br>
 
     <form action="/upload_media_details" method="post">
       <div class="row" style="width:80%;">
-      <div class="col">
-      <div class="form-group">
-        <label>Submitter Name</label>
-        <input name="submitter-name" class="form-control" style="width:50%" required maxlength="20">
-      </div>
-    </div>
+        <div class="col">
+          <div class="form-group">
+            <label>Submitter Name</label>
+            <input name="submitter-name" class="form-control" style="width:50%; min-width: 100px;" required maxlength="20"/>
+          </div>
+        </div>
 
-    <div class="col">
-      <div class="form-group">
-        <label>Date Produced</label>
-        <input type="date" name="date" class="form-control" style="width:50%" required>
-      </div>
+      <div class="col">
+        <div class="form-group">
+          <label>Date Produced</label>
+          <input type="date" name="date" class="form-control" style="width:50%; min-width: 100px;" required>
+        </div>
       </div>
     </div>
 
 
     <div class="row" style="width:80%;">
       <div class="col">
-      <div class="form-group">
-        <label>Submitter Email</label>
-        <input type="email" name="submitter-email" class="form-control" style="width:50%" required maxlength="30"
-        pattern="[^@\s]+@[^@\s]+\.[^@\s]+">
-      </div>
+        <div class="form-group">
+          <label>Submitter Email</label>
+          <input type="email" name="submitter-email" class="form-control" style="width:50% ; min-width: 100px;" required maxlength="30"
+          pattern="[^@\s]+@[^@\s]+\.[^@\s]+">
+        </div>
       </div>
       <!-- pattern="/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/" -->
 
       <div class="col">
         <div class="form-group">
           <label>Submitter Pronouns</label>
-          <input name="submitter-pronouns" class="form-control" style="width:50%" required maxlength="30">
+          <input name="submitter-pronouns" class="form-control" style="width:50%; min-width: 100px;" required maxlength="30">
 
 
         </div>
@@ -85,7 +85,6 @@
       </div>
     </div>
     </div>
-
 
     <div class="row" style="width:80%;">
       <div class="col">
