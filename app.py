@@ -305,6 +305,7 @@ def unauthorized_page():
 @app.route('/verifyme', methods=['GET', 'POST'])
 def generate_verification_code():
     to_email = session['to_email']
+
     error = None
     if request.method == 'POST':
         verification_code = request.form['verificationcode']
@@ -317,10 +318,16 @@ def generate_verification_code():
                 print(submission)
 
 
+
+
+
                 inserted = insert_db(submission)
 
                 if not inserted:
-                    return render_template('upload_video_details.html', error_message="Unable to submit submission. Please resubmit the form again.")
+                    if submission["media-type"] == "Video":
+                        return render_template('upload_video_details.html', error_message="Unable to submit submission. Please resubmit the form again.")
+                    else:
+                        return render_template('upload_media_details.html', error_message="Unable to submit submission. Please resubmit the form again.")
 
 
                 # send email to admin

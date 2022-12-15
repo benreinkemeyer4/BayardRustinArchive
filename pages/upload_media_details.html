@@ -99,6 +99,10 @@
     {{ recaptcha }}
 
     <p>{{ message }}</p>
+    {% if error_message %}
+    <p>{{error_message}}</p>
+
+    {% endif %}
     <input type="hidden" name="csrf_token"
              value="{{csrf_token()}}">
 
