@@ -22,7 +22,6 @@
     <br>
 
     <form action="/upload_media_details" method="post">
-
       <div class="row" style="width:80%;">
       <div class="col">
       <div class="form-group">
@@ -100,6 +99,8 @@
     {{ recaptcha }}
 
     <p>{{ message }}</p>
+    <input type="hidden" name="csrf_token"
+             value="{{csrf_token()}}">
 
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>

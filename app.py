@@ -18,6 +18,7 @@ from twilio.rest import Client
 from dotenv import load_dotenv
 from twilio.base.exceptions import TwilioRestException
 import cloudinary_methods
+import flask_wtf.csrf
 
 
 
@@ -29,6 +30,7 @@ load_dotenv()
 app = Flask(__name__, template_folder='./pages')
 app.secret_key = "secret key"
 
+flask_wtf.csrf.CSRFProtect(app)
 
 
 # 10 Mb limit
@@ -235,6 +237,12 @@ def video_instructions():
     response = make_response(html_code)
     return response
 
+# @app.route('/csrfattack', methods=['GET', "POST"])
+# def csrf_attack():
+
+#     html_code = render_template('csrfattack.html')
+#     response = make_response(html_code)
+#     return response
 
 @app.route('/upload_video_details', methods=['GET', 'POST'])
 def upload_video_details():

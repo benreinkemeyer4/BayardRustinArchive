@@ -28,7 +28,8 @@
       align-items: center;
       justify-content: center; flex-direction: row; justify-content: space-around;"  class="container-fluid">
           <form method="post" action="/admin_details"  style="margin-right:5px">
-
+            <input type="hidden" name="csrf_token"
+             value="{{csrf_token()}}">
             <input name="btn_identifier" value="delete" type="hidden">
             <input name="mediaid" value="{{result_dict.mediaid}}" type="hidden">
             <input type="submit" name="delete" value="Delete" onclick="clicked(event)"  class="btn btn-primary">
@@ -36,6 +37,8 @@
 
           {% if result_dict.approved == False %}
           <form method="post" action="/admin_details" style="margin-right:5px">
+            <input type="hidden" name="csrf_token"
+             value="{{csrf_token()}}">
             <input name="btn_identifier" value="approve" type="hidden">
             <input name="mediaid" value="{{result_dict.mediaid}}" type="hidden">
             <input type="submit" name="approve" value="Approve"   class="btn btn-primary">
@@ -43,6 +46,8 @@
           {% endif %}
           {% if result_dict.approved == True %}
           <form method="post" action="/admin_details">
+            <input type="hidden" name="csrf_token"
+             value="{{csrf_token()}}">
             <input name="btn_identifier" value="unapprove" type="hidden">
             <input name="mediaid" value="{{result_dict.mediaid}}" type="hidden">
             <input type="submit" name="unapprove" value="Unapprove" class="btn btn-primary">

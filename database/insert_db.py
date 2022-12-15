@@ -39,7 +39,7 @@ def insert_db(submission):
         connection.commit()
         print("1 Record inserted successfully")
 
-        return True
+        return False
         # Fetch result
         # cursor.execute("SELECT * from submissions")
         # record = cursor.fetchall()
