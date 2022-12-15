@@ -22,6 +22,8 @@
     <br>
 
     <form action="/admin_edit?mediaid={{mediaid}}" method="post">
+      <input type="hidden" name="csrf_token"
+             value="{{csrf_token()}}">
       <div class="row" style="width:80%;">
       <div class="col">
       <div class="form-group">
@@ -112,7 +114,7 @@
     justify-content: center; flex-direction: column;">
     {% if result_dict["mediatype"] == "Image"%}
     <a href="{{result_dict.mediaurl}}" download = "{{result_dict.mediaurl}}"><img src="{{result_dict.mediaurl}}" width="800px"/></a>
-    
+
     {% elif result_dict["mediatype"] == "Document" %}
     <embed src="{{result_dict.mediaurl}}" width="800px" height="2100px" />
     {% elif result_dict["mediatype"] == "Video" %}

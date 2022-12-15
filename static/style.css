@@ -8,9 +8,10 @@ background-color: white;}
 
 body {
     margin-top: 120px;
-    font-family: 'American Typewriter', sans-serif
+    font-family: 'American Typewriter', sans-serif;
 }
 
 li {
     list-style-type: none; 
   }
+

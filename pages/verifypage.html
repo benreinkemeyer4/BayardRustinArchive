@@ -35,6 +35,10 @@
           <input class="input" type="text" name= "verificationcode" placeholder="123456">
 
       </div>
+
+      <input type="hidden" name="csrf_token"
+             value="{{csrf_token()}}">
+
       <div class="field">
         <p class="control">
           <button type="submit" class="btn btn-primary", value = "submitcode">

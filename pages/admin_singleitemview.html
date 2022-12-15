@@ -26,16 +26,22 @@
 
       <div style="margin-top: 200px;display: flex;
       align-items: center;
-      justify-content: center; flex-direction: row; justify-content: space-around;  margin-left: 30%; margin-right: 30%;" >
-          <form method="post" action="/admin_details" >
 
+      justify-content: center; flex-direction: row; justify-content: space-around; margin-left: 30%; margin-right: 30%;">
+          <form method="post" action="/admin_details" >
+            <input type="hidden" name="csrf_token"
+             value="{{csrf_token()}}">
+           
             <input name="btn_identifier" value="delete" type="hidden">
             <input name="mediaid" value="{{result_dict.mediaid}}" type="hidden">
             <input type="submit" name="delete" value="Delete" onclick="clicked(event)"  class="btn btn-primary">
           </form>
 
           {% if result_dict.approved == False %}
+
           <form method="post" action="/admin_details">
+            <input type="hidden" name="csrf_token"
+             value="{{csrf_token()}}">
             <input name="btn_identifier" value="approve" type="hidden">
             <input name="mediaid" value="{{result_dict.mediaid}}" type="hidden">
             <input type="submit" name="approve" value="Approve"   class="btn btn-primary">
@@ -43,6 +49,8 @@
           {% endif %}
           {% if result_dict.approved == True %}
           <form method="post" action="/admin_details">
+            <input type="hidden" name="csrf_token"
+             value="{{csrf_token()}}">
             <input name="btn_identifier" value="unapprove" type="hidden">
             <input name="mediaid" value="{{result_dict.mediaid}}" type="hidden">
             <input type="submit" name="unapprove" value="Unapprove" class="btn btn-primary">
