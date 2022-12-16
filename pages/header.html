@@ -24,14 +24,21 @@
         <a class="nav-link" target="_blank" href="https://www.rustincenter.org/">Bayard Rustin Center for Social Justice</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="./login">Admin Login</a>
+        {% if logged_in %}
+        <a class="nav-link" href="./admin_gallery">Admin Gallery</a>
+
+      <li class="nav-item">
+        <a class="nav-link" href="./logoutapp">Logout</a>
+      </li>
+        {% else %}
+        <a class="nav-link" href="./login">Admin Gallery</a>
+        {% endif %}
+
 
       </li>
       <li>
 
-        {% if logged_in %}
-        <a class="nav-link" aria-current="page" href="/logoutgoogle" style="color: blue">Logout</a>
-        {% endif %}
+
       </li>
     </ul>
   </div>

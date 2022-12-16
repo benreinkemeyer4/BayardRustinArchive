@@ -66,7 +66,6 @@ recaptcha = ReCaptcha(app) # Create a ReCaptcha object by passing in 'app' as pa
 
 media_url = ""
 media_type = ""
-
 tags = ["1963 March on Washington for Jobs and Freedom", "Paper", "Pamphlet", "Leaflet", "Video", "Audio", "Essay", "Book", "Photograph", "Research", "Personal", "Interaction", "Story", "Speech", "Activism", "Gandhi", "Civil Rights", "LGBTQIA+ rights", "Intersectionality", "Labor Rights", "Voting Rights", "Union", "AFL-CIO", "Black Power", "Organizer", "Martin Luther King", "A. Philip Randolph", "Pacifism", "Quaker", "Protest", "Boycott", "Sit-in", "News", "Queer", "Africa", "Zambia", "Malcolm X", "President Obama", "Southern Christian Leadership Conference", "Freedom Riders", "Medal of Freedom", "Walter Naegle", "Bayard Rustin Center For Social Justice"]
 
 tags.sort()
@@ -99,6 +98,13 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+@app.context_processor
+def inject_stage_and_region():
+    # if not session.get('logged_in'):
+    #     session['logged_in'] = False
+    return dict(logged_in=session['logged_in'])
+
+
 # Routes for authentication. -------------------
 @app.route('/login', methods=['GET'])
 def login():
@@ -108,6 +114,10 @@ def login():
 @app.route('/login/callback', methods=['GET'])
 def callback():
     return auth.callback()
+
+@app.route('/logoutapp', methods=['GET'])
+def logoutapp():
+    return auth.logoutapp()
 
 @app.route('/logoutgoogle', methods=['GET'])
 def logoutgoogle():
@@ -167,6 +177,8 @@ def index():
             return redirect(request.url)
 
 
+    if 'logged_in' not in session:
+        session["logged_in"] = False
     html_code = render_template('index.html')
     response = make_response(html_code)
     return response
@@ -398,6 +410,8 @@ def gallery():
 
 @app.route('/admin_gallery', methods=['GET'])
 def admin_gallery():
+    username = auth.authenticate()
+
     # id, name, date created, date submitted, email, title, description, media url, approved, media_type, tags
     # 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10
     status_results = query_db()
@@ -494,6 +508,7 @@ def singleitemview():
 
 @app.route('/admin_details', methods=['GET', 'POST'])
 def admin_singleitemview():
+    username = auth.authenticate()
     if request.method == 'POST':
         mediaid = request.form.get('mediaid')
 
@@ -692,7 +707,7 @@ def admin_edit():
 
 @app.route('/header', methods=['GET'])
 def header():
-    html_code = render_template('header.html', logged_in = session["logged_in"])
+    html_code = render_template('header.html')
     response = make_response(html_code)
     return response
 

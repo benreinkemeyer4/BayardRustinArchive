@@ -150,6 +150,7 @@ def callback():
 
 #-----------------------------------------------------------------------
 
+
 def logoutgoogle():
 
     # Log out of the application.
@@ -160,6 +161,14 @@ def logoutgoogle():
         'https://mail.google.com/mail/u/0/?logout&hl=en'))
 
 #-----------------------------------------------------------------------
+
+def logoutapp():
+    flask.session.clear()
+    flask.session['logged_in'] = False
+    html_code = flask.render_template('index.html')
+    response = flask.make_response(html_code)
+    return response
+
 
 def authenticate():
 
