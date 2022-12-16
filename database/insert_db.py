@@ -40,12 +40,14 @@ def insert_db(submission):
         # Executing a SQL query
         #cursor.execute('''INSERT INTO submissions (name,date_taken,date_uploaded,email,tags,title,description,media_url) VALUES ('Bob Dylan', '1993-03-15','2022-10-29', 'sw42@princeton.edu', 'document', 'test', 'test', 'test');''')
 
-        stmt = '''INSERT INTO submissions (name,date_taken,date_uploaded,email,tags,title,description,media_url,media_type,pronouns) VALUES (%s, %s,%s, %s, %s, %s, %s, %s, %s, %s);'''
+        stmt = '''INSERT INTO submissions (name,date_taken,date_uploaded,email,tags,title,description,media_url,media_type,pronouns) VALUES (%s, %s,%s, %s, %s, %s, %s, %s, %s, %s)
+        RETURNING submission_id;'''
         cursor.execute(stmt, (sub_name, date_taken, date_uploaded, sub_email, tags, title, desc, media_url, media_type, sub_pronouns))
+        id_of_new_row = cursor.fetchone()[0]
         connection.commit()
         print("1 Record inserted successfully")
 
-        return True
+        return {"error": False, "res": id_of_new_row}
         # Fetch result
         # cursor.execute("SELECT * from submissions")
         # record = cursor.fetchall()
@@ -53,7 +55,7 @@ def insert_db(submission):
 
     except (Exception, Error) as error:
         print("Error while connecting to PostgreSQL", error)
-        return False
+        return {"error": True, "res": error}
 
     finally:
         if (connection):

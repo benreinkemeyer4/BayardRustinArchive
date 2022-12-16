@@ -320,9 +320,11 @@ def generate_verification_code():
 
 
 
-                inserted = insert_db(submission)
+                db_result = insert_db(submission)
 
-                if not inserted:
+                error = db_result["error"]
+
+                if error:
                     if submission["media-type"] == "Video":
                         return render_template('upload_video_details.html', error_message="Unable to submit submission. Please resubmit the form again.")
                     else:
