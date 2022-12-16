@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 from flask import Flask, render_template, request, make_response, redirect, flash, url_for, session
-from werkzeug.utils import secure_filename
-from werkzeug.exceptions import RequestEntityTooLarge
 from database.query_db import query_db
 from database.insert_db import insert_db
 from database.query_singleitem_db import query_singleitem_db
@@ -60,8 +58,8 @@ client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 app.config['RECAPTCHA_ENABLE'] = True
-app.config['RECAPTCHA_SITE_KEY'] = '6LfwBSkjAAAAAEyt-PsS-GxKSfyVWT4jo882WD6R' # <-- Add your site key
-app.config['RECAPTCHA_SECRET_KEY'] = '6LfwBSkjAAAAAFJf6CN8M2G-_NZm8AaN1pSjYdwm' # <-- Add your secret key
+app.config['RECAPTCHA_SITE_KEY'] = os.environ.get('RECAPTCHA_SITE_KEY')
+app.config['RECAPTCHA_SECRET_KEY'] = os.environ.get('RECAPTCHA_SECRET_KEY')
 recaptcha = ReCaptcha(app) # Create a ReCaptcha object by passing in 'app' as parameter
 
 
@@ -73,6 +71,7 @@ tags = ["1963 March on Washington for Jobs and Freedom", "Paper", "Pamphlet", "L
 
 tags.sort()
 
+# parse youtube url and return unique key
 def video_id(value):
     """
     Examples:
@@ -92,7 +91,6 @@ def video_id(value):
             return query.path.split('/')[2]
         if query.path[:3] == '/v/':
             return query.path.split('/')[2]
-    # fail?
     return None
 
 

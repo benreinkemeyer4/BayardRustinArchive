@@ -2,8 +2,14 @@ import psycopg2
 from psycopg2 import Error
 import urllib.parse as up
 from datetime import date
+import os
+from dotenv import load_dotenv
 
-url = up.urlparse("postgres://oegsfiae:WUg1B4yX8l8PXcVH_E87mjkgD6IfcTOV@peanut.db.elephantsql.com/oegsfiae")
+
+load_dotenv()
+
+DATABASE_URL = os.environ.get('DATABASE_URL')
+url = up.urlparse(DATABASE_URL)
 
 def insert_db(submission):
     sub_name = submission["submitter-name"]
